@@ -1,304 +1,213 @@
-import { getConfig, getMetadata } from '../../scripts/ak.js';
-import { loadFragment } from '../fragment/fragment.js';
-import { setColorScheme } from '../section-metadata/section-metadata.js';
+/*
+ * Header block: builds the site header from the authored nav fragment (nav.plain.html).
+ *
+ * Fragment contract (flat, semantic):
+ *   section 1: brand link (logo image)
+ *   section 2: primary nav list - <li><p>Label</p><ul>…links…</ul></li> becomes a click dropdown
+ *   section 3: tools list - dropdowns as above, plus a search item:
+ *              <li><p><a href="…?q=">Search</a></p><p>placeholder</p></li>
+ * Inside dropdowns:
+ *   <strong><a></a></strong>              -> emphasized "all services" link
+ *   <li><p>Label</p><p><em><a href="…=">Submit</a></em></p></li> -> inline input form
+ *   <li><p>text with <a>link</a></p></li> -> note paragraph
+ */
 
-const { locale } = getConfig();
+const NAV_PATHS = ['/content/nav.plain.html', '/nav.plain.html'];
+const DESKTOP = window.matchMedia('(width >= 900px)');
 
-const HEADER_PATH = '/fragments/nav/header';
-
-const menuTriggers = new WeakMap();
-
-function closeAllMenus() {
-  const openMenus = document.body.querySelectorAll('header .is-open');
-  for (const container of openMenus) {
-    container.classList.remove('is-open');
-    const trigger = menuTriggers.get(container);
-    if (trigger) trigger.ariaExpanded = 'false';
-  }
-}
-
-function docClose(e) {
-  if (e.target.closest('header')) return;
-  closeAllMenus();
-}
-
-function menuKeydown(e) {
-  if (e.key !== 'Escape') return;
-  const open = e.target.closest('.is-open');
-  if (!open) return;
-  e.stopPropagation();
-  const trigger = menuTriggers.get(open);
-  closeAllMenus();
-  trigger?.focus();
-}
-
-function menuFocusout(e) {
-  const open = e.target.closest('.is-open');
-  if (!open) return;
-  if (!e.relatedTarget) return;
-  if (open.contains(e.relatedTarget)) return;
-  closeAllMenus();
-}
-
-function toggleMenu(container) {
-  const isOpen = container.classList.contains('is-open');
-  closeAllMenus();
-  if (isOpen) return;
-  document.addEventListener('click', docClose);
-  container.classList.add('is-open');
-  const trigger = menuTriggers.get(container);
-  if (trigger) trigger.ariaExpanded = 'true';
-}
-
-function decorateLanguage(btn) {
-  const section = btn.closest('.section');
-  btn.ariaExpanded = 'false';
-  menuTriggers.set(section, btn);
-  section.addEventListener('keydown', menuKeydown);
-  section.addEventListener('focusout', menuFocusout);
-  btn.addEventListener('click', async () => {
-    let menu = section.querySelector('.language.menu');
-    if (!menu) {
-      const content = document.createElement('div');
-      content.classList.add('block-content');
-      const fragment = await loadFragment(`${locale.prefix}${HEADER_PATH}/languages`);
-      menu = document.createElement('div');
-      menu.className = 'language menu';
-      menu.append(fragment);
-      content.append(menu);
-      section.append(content);
+async function fetchNav() {
+  for (const path of NAV_PATHS) {
+    // metadata-independent: /content first (local preview), then site root (DA/EDS)
+    // eslint-disable-next-line no-await-in-loop
+    const resp = await fetch(path);
+    if (resp.ok) {
+      const wrapper = document.createElement('div');
+      // eslint-disable-next-line no-await-in-loop
+      wrapper.innerHTML = await resp.text();
+      // relative media paths in the fragment resolve against the fragment, not the page
+      wrapper.querySelectorAll('img[src]').forEach((img) => {
+        img.src = new URL(img.getAttribute('src'), resp.url).href;
+      });
+      return wrapper;
     }
-    toggleMenu(section);
+  }
+  return null;
+}
+
+function closeAll(header) {
+  header.querySelectorAll('.nav-item.is-open').forEach((item) => {
+    item.classList.remove('is-open');
+    item.querySelector(':scope > .nav-trigger')?.setAttribute('aria-expanded', 'false');
   });
+  header.classList.remove('is-dropdown-open');
 }
 
-function decorateScheme(btn) {
-  const dark = () => {
-    const { classList } = document.body;
-    if (classList.contains('dark-scheme')) return true;
-    if (classList.contains('light-scheme')) return false;
-    return matchMedia('(prefers-color-scheme: dark)').matches;
-  };
-  btn.ariaPressed = String(dark());
-  btn.addEventListener('click', async () => {
-    const { body } = document;
-
-    const theme = dark()
-      ? { add: 'light-scheme', remove: 'dark-scheme' }
-      : { add: 'dark-scheme', remove: 'light-scheme' };
-
-    body.classList.remove(theme.remove);
-    body.classList.add(theme.add);
-    localStorage.setItem('color-scheme', theme.add);
-    // Re-calculatie section schemes
-    const sections = document.querySelectorAll('.section');
-    for (const section of sections) {
-      setColorScheme(section);
-    }
-    btn.ariaPressed = String(dark());
-  });
+function toggleItem(header, item) {
+  const wasOpen = item.classList.contains('is-open');
+  closeAll(header);
+  if (wasOpen) return;
+  item.classList.add('is-open');
+  item.querySelector(':scope > .nav-trigger').setAttribute('aria-expanded', 'true');
+  header.classList.add('is-dropdown-open');
 }
 
-const drawerEscHandlers = new WeakMap();
-
-function teardownDrawer(header) {
-  header.classList.remove('is-mobile-open');
-  for (const el of document.querySelectorAll('main, footer')) el.inert = false;
-  const escHandler = drawerEscHandlers.get(header);
-  if (escHandler) {
-    document.removeEventListener('keydown', escHandler);
-    drawerEscHandlers.delete(header);
-  }
-}
-
-function syncDrawerState(header) {
-  const toggle = header.querySelector('.action-wrapper.nav-toggle button');
-  const drawerMode = !!toggle?.checkVisibility();
-  if (!drawerMode && header.classList.contains('is-mobile-open')) {
-    teardownDrawer(header);
-  }
-  const isOpen = header.classList.contains('is-mobile-open');
-  const collapsed = drawerMode && !isOpen;
-  for (const section of header.querySelectorAll('.main-nav-section, .actions-section')) {
-    section.inert = collapsed && !section.contains(toggle);
-  }
-  if (toggle) toggle.ariaExpanded = String(drawerMode && isOpen);
-}
-
-function closeDrawer(header, toggle) {
-  teardownDrawer(header);
-  syncDrawerState(header);
-  toggle.focus();
-}
-
-function decorateNavToggle(btn) {
-  btn.ariaExpanded = 'false';
-  btn.addEventListener('click', () => {
-    const header = btn.closest('header');
-    if (!header) return;
-    const opening = !header.classList.contains('is-mobile-open');
-    if (!opening) {
-      closeDrawer(header, btn);
+// <li><p>Label</p><p><em><a href="…=">Submit</a></em></p></li> -> label + input + submit button
+function buildInputForm(li, id) {
+  const [labelP, submitP] = li.querySelectorAll(':scope > p');
+  const link = submitP.querySelector('a');
+  const form = document.createElement('form');
+  form.className = 'nav-panel-form';
+  const label = document.createElement('label');
+  label.htmlFor = id;
+  label.textContent = labelP.textContent.trim();
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.id = id;
+  input.name = id;
+  input.placeholder = label.textContent;
+  input.autocomplete = 'off';
+  const button = document.createElement('button');
+  button.type = 'submit';
+  button.textContent = link.textContent.trim();
+  form.append(label, input, button);
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const value = input.value.trim();
+    if (!value) {
+      input.focus();
       return;
     }
-    header.classList.add('is-mobile-open');
-    for (const el of document.querySelectorAll('main, footer')) el.inert = true;
-    syncDrawerState(header);
-    header.querySelector('.main-nav-section a, .main-nav-section button')?.focus();
-    const escHandler = (e) => {
-      if (e.key !== 'Escape') return;
-      closeAllMenus();
-      closeDrawer(header, btn);
-    };
-    drawerEscHandlers.set(header, escHandler);
-    document.addEventListener('keydown', escHandler);
+    window.location.href = `${link.href}${encodeURIComponent(value)}`;
+  });
+  li.replaceChildren(form);
+  li.classList.add('nav-panel-form-item');
+}
+
+function decoratePanelItems(list, prefix) {
+  [...list.children].forEach((li, idx) => {
+    const paragraphs = li.querySelectorAll(':scope > p');
+    if (paragraphs.length === 2 && paragraphs[1].querySelector('em > a')) {
+      buildInputForm(li, `${prefix}-input-${idx}`);
+    } else if (li.querySelector(':scope > strong > a')) {
+      li.classList.add('nav-panel-strong');
+    } else if (paragraphs.length === 1) {
+      li.classList.add('nav-panel-note');
+    }
   });
 }
 
-const HEADER_ACTIONS = [
-  { name: 'scheme', path: '/tools/widgets/scheme', decorate: decorateScheme },
-  { name: 'language', path: '/tools/widgets/language', decorate: decorateLanguage },
-  { name: 'nav-toggle', path: '/tools/widgets/toggle', decorate: decorateNavToggle },
-];
+let panelId = 0;
 
-function decorateAction(header, { name, path, decorate }) {
-  const link = header.querySelector(`[href*="${path}"]`);
-  if (!link) return;
-
-  const icon = link.querySelector('.icon');
-  const text = link.textContent;
-  const btn = document.createElement('button');
-  if (icon) btn.append(icon);
-  if (text) {
-    const textSpan = document.createElement('span');
-    textSpan.className = 'text';
-    textSpan.textContent = text;
-    btn.append(textSpan);
-  }
-  const wrapper = document.createElement('div');
-  wrapper.className = `action-wrapper ${name}`;
-  wrapper.append(btn);
-  link.parentElement.parentElement.replaceChild(wrapper, link.parentElement);
-
-  decorate(btn);
-}
-
-function decorateMenu(li) {
+// <li><p>Label</p><ul>…</ul></li> -> trigger button + dropdown panel
+function decorateDropdown(li, header) {
+  const labelP = li.querySelector(':scope > p');
   const list = li.querySelector(':scope > ul');
-  if (!list) return null;
-  const wrapper = document.createElement('div');
-  wrapper.className = 'menu';
-  wrapper.append(list);
-  li.append(wrapper);
-  return wrapper;
+  if (!labelP || !list) return;
+  panelId += 1;
+  const id = `nav-panel-${panelId}`;
+  const trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'nav-trigger';
+  trigger.setAttribute('aria-expanded', 'false');
+  trigger.setAttribute('aria-controls', id);
+  const text = document.createElement('span');
+  text.className = 'nav-trigger-text';
+  text.textContent = labelP.textContent.trim();
+  trigger.append(text);
+  const panel = document.createElement('div');
+  panel.className = 'nav-panel';
+  panel.id = id;
+  const inner = document.createElement('div');
+  inner.className = 'nav-panel-inner';
+  list.classList.add('nav-panel-list');
+  decoratePanelItems(list, id);
+  inner.append(list);
+  panel.append(inner);
+  li.classList.add('nav-item');
+  li.replaceChildren(trigger, panel);
+  trigger.addEventListener('click', () => toggleItem(header, li));
 }
 
-function decorateMegaMenu(li) {
-  const menu = li.querySelector('.fragment-content');
-  if (!menu) return null;
-  const wrapper = document.createElement('div');
-  wrapper.className = 'mega-menu';
-  wrapper.append(menu);
-  li.append(wrapper);
-  return wrapper;
+// <li><p><a href="…?q=">Search</a></p><p>placeholder</p></li> -> icon toggle + search bar
+function decorateSearch(li, header, bar) {
+  const link = li.querySelector('a');
+  const placeholder = li.querySelectorAll(':scope > p')[1]?.textContent.trim() || '';
+  const label = link.textContent.trim();
+
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'nav-search-toggle';
+  toggle.setAttribute('aria-label', label);
+  toggle.setAttribute('aria-expanded', 'false');
+
+  const form = document.createElement('form');
+  form.className = 'nav-search';
+  form.setAttribute('role', 'search');
+  const input = document.createElement('input');
+  input.type = 'search';
+  input.name = 'q';
+  input.placeholder = placeholder;
+  input.setAttribute('aria-label', placeholder || label);
+  const submit = document.createElement('button');
+  submit.type = 'submit';
+  submit.className = 'nav-search-submit';
+  submit.setAttribute('aria-label', label);
+  const field = document.createElement('div');
+  field.className = 'nav-search-field';
+  field.append(input, submit);
+  const close = document.createElement('button');
+  close.type = 'button';
+  close.className = 'nav-search-close';
+  close.setAttribute('aria-label', `Exit ${label}`);
+  form.append(field, close);
+
+  const setOpen = (open) => {
+    header.classList.toggle('is-search-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    if (open) {
+      closeAll(header);
+      input.focus();
+    } else {
+      toggle.focus();
+    }
+  };
+  toggle.addEventListener('click', () => setOpen(true));
+  close.addEventListener('click', () => setOpen(false));
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const q = input.value.trim();
+    if (!q) {
+      input.focus();
+      return;
+    }
+    window.location.href = `${link.href}${encodeURIComponent(q)}`;
+  });
+  form.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+
+  li.classList.add('nav-search-item');
+  li.replaceChildren(toggle);
+  bar.append(form);
 }
 
-let menuId = 0;
-
-function decorateNavItem(li) {
-  li.classList.add('main-nav-item');
-  const link = li.querySelector(':scope > p > a');
-  if (link) link.classList.add('main-nav-link');
-  if (link && link.pathname === window.location.pathname) link.ariaCurrent = 'page';
-  const menu = decorateMegaMenu(li) || decorateMenu(li);
-  if (!menu || !link) return;
-
-  menuId += 1;
-  menu.id = `header-menu-${menuId}`;
-  const btn = document.createElement('button');
-  btn.className = 'main-nav-link';
-  btn.type = 'button';
-  btn.textContent = link.textContent;
-  btn.ariaExpanded = 'false';
-  btn.setAttribute('aria-controls', menu.id);
-  link.replaceWith(btn);
-  menuTriggers.set(li, btn);
-
-  btn.addEventListener('click', () => {
-    toggleMenu(li);
+function decorateList(list, header, bar) {
+  [...list.children].forEach((li) => {
+    if (li.querySelector(':scope > ul')) decorateDropdown(li, header);
+    else if (li.querySelectorAll(':scope > p').length === 2 && li.querySelector(':scope > p > a')) {
+      decorateSearch(li, header, bar);
+    }
   });
 }
 
-const SKIP_PATH = '/tools/widgets/skip';
-const SKIP_FALLBACK = 'Skip to main content';
-
-export function decorateSkipLink(header) {
+// authored "#main" link in the brand section becomes the skip link
+function decorateSkipLink(header, brand) {
+  const skip = brand?.querySelector('a[href^="#"]');
   const main = document.querySelector('main');
-  if (!main) return;
-  if (!main.id) main.id = 'main';
-  const authored = header.querySelector(`[href*="${SKIP_PATH}"]`);
-  const skip = document.createElement('a');
-  skip.className = 'skip-link a11y-clip';
+  if (!skip || !main) return;
+  if (!main.id) main.id = skip.hash.slice(1) || 'main';
   skip.href = `#${main.id}`;
-  if (authored) {
-    skip.textContent = authored.textContent;
-    authored.parentElement.remove();
-  } else {
-    skip.textContent = SKIP_FALLBACK;
-    skip.lang = 'en';
-  }
+  skip.className = 'skip-link';
+  skip.closest('p')?.remove();
   header.prepend(skip);
-}
-
-function decorateBrandSection(section) {
-  section.classList.add('brand-section');
-  const brandLink = section.querySelector('a');
-  if (!brandLink) return;
-  const [, text] = brandLink.childNodes;
-  if (!text) return;
-  const span = document.createElement('span');
-  span.className = 'brand-text';
-  span.append(text);
-  brandLink.append(span);
-}
-
-export function decorateNavSection(section) {
-  section.classList.add('main-nav-section');
-  const navContent = section.querySelector('.default-content');
-  const navList = section.querySelector('ul');
-  if (!navList) return;
-  navList.classList.add('main-nav-list');
-
-  const nav = document.createElement('nav');
-  nav.append(navList);
-  if (section.dataset.label) nav.ariaLabel = section.dataset.label;
-  navContent.append(nav);
-
-  const mainNavItems = section.querySelectorAll('nav > ul > li');
-  for (const navItem of mainNavItems) {
-    decorateNavItem(navItem);
-  }
-  nav.addEventListener('keydown', menuKeydown);
-  nav.addEventListener('focusout', menuFocusout);
-}
-
-function decorateActionSection(section) {
-  section.classList.add('actions-section');
-}
-
-export function decorateHeaderContent(header) {
-  decorateSkipLink(header);
-  const sections = header.querySelectorAll(':scope > .section, :scope > .header-content > .section');
-  if (sections[0]) decorateBrandSection(sections[0]);
-  if (sections[1]) decorateNavSection(sections[1]);
-  if (sections[2]) decorateActionSection(sections[2]);
-
-  for (const action of HEADER_ACTIONS) {
-    decorateAction(header, action);
-  }
-
-  syncDrawerState(header);
-  new ResizeObserver(() => syncDrawerState(header)).observe(header);
 }
 
 /**
@@ -306,14 +215,48 @@ export function decorateHeaderContent(header) {
  * @param {Element} el The header element
  */
 export default async function init(el) {
-  const headerMeta = getMetadata('header-source');
-  const path = headerMeta || HEADER_PATH;
-  try {
-    const fragment = await loadFragment(`${locale.prefix}${path}`);
-    fragment.classList.add('header-content');
-    el.append(fragment);
-    decorateHeaderContent(el);
-  } catch (e) {
-    throw Error(e);
+  const fragment = await fetchNav();
+  if (!fragment) return;
+  const [brand, sections, tools] = fragment.querySelectorAll(':scope > div');
+
+  const bar = document.createElement('div');
+  bar.className = 'nav-bar';
+  const nav = document.createElement('nav');
+  nav.setAttribute('aria-label', 'Main');
+
+  if (brand) {
+    brand.className = 'nav-brand';
+    bar.append(brand);
   }
+  [sections, tools].forEach((section, idx) => {
+    const list = section?.querySelector(':scope > ul');
+    if (!list) return;
+    list.className = `nav-list ${idx === 0 ? 'nav-sections' : 'nav-tools'}`;
+    decorateList(list, el, bar);
+    nav.append(list);
+  });
+  bar.insertBefore(nav, bar.querySelector('.nav-search'));
+
+  const overlay = document.createElement('div');
+  overlay.className = 'nav-overlay';
+  overlay.addEventListener('click', () => closeAll(el));
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'nav-wrapper';
+  wrapper.append(bar);
+  el.replaceChildren(wrapper, overlay);
+  decorateSkipLink(el, brand);
+
+  document.addEventListener('click', (e) => { if (!el.contains(e.target)) closeAll(el); });
+  el.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const open = el.querySelector('.nav-item.is-open > .nav-trigger');
+    closeAll(el);
+    open?.focus();
+  });
+  // Crossing the desktop breakpoint resets any open panel / search state.
+  DESKTOP.addEventListener('change', () => {
+    closeAll(el);
+    el.classList.remove('is-search-open', 'is-menu-open');
+  });
 }
