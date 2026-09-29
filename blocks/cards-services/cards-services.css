@@ -69,6 +69,11 @@
       padding-top: 13px;
       font-size: 14px;
       line-height: 18.2px;
+
+      /* source link is a block box spanning the full card width (299px @1440) */
+      > a:any-link {
+        display: block;
+      }
     }
 
     a:any-link {

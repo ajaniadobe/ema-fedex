@@ -310,9 +310,10 @@ a {
     margin: 4px 0 8px;
   }
 
-  /* section titles are centered, light weight (:nth-child(n) outranks the same reset) */
+  /* section titles are centered, light weight (:nth-child(n) outranks the same reset);
+     the top margin collapses with the section gap to give FedEx's 50px */
   > .default-content > h2:nth-child(n) {
-    margin: 20px 0;
+    margin: 50px 0 35px;
     text-align: center;
   }
 
@@ -320,14 +321,28 @@ a {
   > .default-content p > a:not(.btn) {
     color: inherit;
     text-decoration: underline;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--color-link);
+    }
   }
 
   > .default-content p:has(> a.btn:only-child) {
     text-align: center;
   }
 
+  /* legal notes after a block: each note group starts with a bold title */
+  > .block-content + .default-content > p:not(:first-child):is(:has(> strong:only-child), :last-child) {
+    margin-top: 26px;
+  }
+
   /* constrained light-grey panel (not full bleed) */
   &.grey {
+    &:not(:first-child) {
+      margin-top: 55px;
+    }
+
     > .default-content,
     > .block-content {
       max-width: var(--grid-container-width);
@@ -336,10 +351,20 @@ a {
       color: var(--color-text);
     }
 
+    /* padding keeps the CTA margins inside the panel (no white seam) */
     > .default-content {
-      padding: 0 0 40px;
+      padding: 26px 0 58px;
     }
   }
+}
+
+/* section-metadata.css paints section children black; keep FedEx text grey */
+main > .section > * {
+  color: var(--color-text);
+}
+
+main > .section:last-child {
+  padding-bottom: 70px;
 }
 
 main {
@@ -434,6 +459,17 @@ svg {
 }
 
 /* @media (width >= 600px) {} */
+
+/* mobile: FedEx's spacer rows shrink, so titles and sections sit tighter */
+@media (width < 768px) {
+  :root {
+    --section-spacing: 20px;
+  }
+
+  .section > .default-content > h2:nth-child(n) {
+    margin: 20px 0 30px;
+  }
+}
 
 @media (width >= 768px) {
   :root {

@@ -5,8 +5,16 @@
 .columns-offer {
   box-sizing: border-box;
   max-width: var(--grid-container-width);
-  margin: 16px auto;
+
+  /*
+   * source: panel margin 16px (top/bottom) sits inside its grid column, so it never
+   * collapses with the section title margin; plus a 1px empty column_control below.
+   * Padding + content-box background reproduces that without margin collapsing.
+   */
+  margin: 0 auto;
+  padding: 16px 0 17px;
   background-color: var(--panel-grey);
+  background-clip: content-box;
   color: var(--text-color);
 
   /* mobile: image on top, text below (source uses flex column-reverse) */
@@ -66,6 +74,7 @@
       &:hover,
       &:focus-visible {
         color: var(--link-hover-color);
+        text-decoration: underline;
       }
     }
   }
