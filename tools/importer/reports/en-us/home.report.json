@@ -1,0 +1,17 @@
+{
+  "status": "success",
+  "url": "https://www.fedex.com/en-us/home.html",
+  "path": "en-us/home",
+  "timestamp": "2026-09-29T12:26:42.540Z",
+  "title": "Track & Ship Online or Find Nearby Locations | FedEx",
+  "template": "home",
+  "blocks": [
+    "hero-video",
+    "cards-quick-actions",
+    "notification-info",
+    "columns-features",
+    "cards-services",
+    "columns-offer",
+    "cards-horizontal"
+  ]
+}

@@ -1,0 +1,144 @@
+{
+  "metadata": {
+    "projectType": "da"
+  },
+  "templates": [
+    {
+      "name": "home",
+      "urls": [
+        "https://www.fedex.com/en-us/home.html"
+      ],
+      "representativeUrl": "https://www.fedex.com/en-us/home.html",
+      "description": "FedEx US homepage: video hero with quick actions, info notice, feature columns, service cards, featured offer, horizontal promo cards and legal notes",
+      "blocks": [
+        {
+          "name": "hero-video",
+          "instances": [
+            ".fxg-hero_homepage .fxg-hero__header"
+          ]
+        },
+        {
+          "name": "cards-quick-actions",
+          "instances": [
+            ".fxg-hero_homepage div.homepage-b-links"
+          ]
+        },
+        {
+          "name": "notification-info",
+          "instances": [
+            ".fxg-notifications--theme-informational"
+          ]
+        },
+        {
+          "name": "columns-features",
+          "instances": [
+            ".fxg-main-content .cmp-container > .experiencefragment:first-child .xf-content-height > .aem-Grid > .column_control_v1:has(.column_control_v1)"
+          ]
+        },
+        {
+          "name": "cards-services",
+          "instances": [
+            ".fxg-main-content .cmp-container > .experiencefragment:first-child .xf-content-height > .aem-Grid > .title_v1:nth-child(10) ~ .column_control_v1:nth-child(12)"
+          ]
+        },
+        {
+          "name": "columns-offer",
+          "instances": [
+            ".featured_offer_v2"
+          ]
+        },
+        {
+          "name": "cards-horizontal",
+          "instances": [
+            ".fxg-main-content .cmp-container > .experiencefragment:first-child .xf-content-height > .aem-Grid > .title_v1:nth-child(19) ~ .column_control_v1"
+          ]
+        }
+      ],
+      "urlPattern": "/en-us/*",
+      "sections": [
+        {
+          "id": "1",
+          "name": "Hero with quick actions",
+          "selector": [
+            ".hero_homepage_v1"
+          ],
+          "style": null,
+          "blocks": [
+            "hero-video",
+            "cards-quick-actions"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "2",
+          "name": "Informational notice",
+          "selector": [
+            ".fxg-main-content .cmp-container > .experiencefragment:first-child .xf-content-height > .aem-Grid > .notifications"
+          ],
+          "style": null,
+          "blocks": [
+            "notification-info"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "3",
+          "name": "Why ship with FedEx",
+          "selector": [
+            ".fxg-main-content .cmp-container > .experiencefragment:first-child .xf-content-height > .aem-Grid > .column_control_v1:has(.column_control_v1)"
+          ],
+          "style": "grey",
+          "blocks": [
+            "columns-features"
+          ],
+          "defaultContent": [
+            ".fxg-main-content .cmp-container > .experiencefragment:first-child .xf-content-height > .aem-Grid > .column_control_v1:nth-child(8)"
+          ]
+        },
+        {
+          "id": "4",
+          "name": "Delivery that works around you",
+          "selector": [
+            ".fxg-main-content .cmp-container > .experiencefragment:first-child .xf-content-height > .aem-Grid > .title_v1:nth-child(10)"
+          ],
+          "style": null,
+          "blocks": [
+            "cards-services"
+          ],
+          "defaultContent": [
+            ".fxg-main-content .cmp-container > .experiencefragment:first-child .xf-content-height > .aem-Grid > .title_v1:nth-child(10)"
+          ]
+        },
+        {
+          "id": "5",
+          "name": "Go global with confidence",
+          "selector": [
+            ".fxg-main-content .cmp-container > .experiencefragment:first-child .xf-content-height > .aem-Grid > .title_v1:nth-child(14)"
+          ],
+          "style": null,
+          "blocks": [
+            "columns-offer"
+          ],
+          "defaultContent": [
+            ".fxg-main-content .cmp-container > .experiencefragment:first-child .xf-content-height > .aem-Grid > .title_v1:nth-child(14)"
+          ]
+        },
+        {
+          "id": "6",
+          "name": "Smarter shipping for growing businesses + legal notes",
+          "selector": [
+            ".fxg-main-content .cmp-container > .experiencefragment:first-child .xf-content-height > .aem-Grid > .title_v1:nth-child(19)"
+          ],
+          "style": null,
+          "blocks": [
+            "cards-horizontal"
+          ],
+          "defaultContent": [
+            ".fxg-main-content .cmp-container > .experiencefragment:first-child .xf-content-height > .aem-Grid > .title_v1:nth-child(19)",
+            ".fxg-main-content .cmp-container > .experiencefragment:nth-child(2)"
+          ]
+        }
+      ]
+    }
+  ]
+}

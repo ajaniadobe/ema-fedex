@@ -1,0 +1,7 @@
+{
+  "enabledPlugins": {
+    "excat-figma@excat-extended": true,
+    "forms-excat@excat-extended": true,
+    "modern-web-guidance@excat-extended": true
+  }
+}

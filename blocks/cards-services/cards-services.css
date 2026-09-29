@@ -1,0 +1,109 @@
+/* values extracted from fedex.com/en-us/home.html "Delivery that works around you" 3-up */
+.cards-services {
+  max-width: var(--grid-container-width);
+  margin: 0 auto;
+  color: var(--text-color);
+
+  .cards-services-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 35px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cards-services-card {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0 15px;
+  }
+
+  .cards-services-image {
+    line-height: 0;
+
+    > p {
+      margin: 0;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 727 / 463;
+      object-fit: cover;
+    }
+  }
+
+  .cards-services-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+
+    h3 {
+      margin: 18px 0;
+      font-size: var(--heading-size-s);
+      font-weight: 400;
+      line-height: var(--heading-line-height);
+      letter-spacing: -0.4px;
+      color: var(--text-color);
+    }
+
+    p {
+      margin: 4px 0 8px;
+      font-size: var(--body-font-size-m);
+      font-weight: 300;
+      line-height: 24px;
+      letter-spacing: -0.1px;
+    }
+
+    sup {
+      font-size: 12px;
+      line-height: 0;
+    }
+
+    /* CTA paragraph: pinned to the card bottom so links align across cards */
+    > p:last-child:has(> a:only-child) {
+      margin: auto 0 0;
+      padding-top: 13px;
+      font-size: 14px;
+      line-height: 18.2px;
+
+      /* source link is a block box spanning the full card width (299px @1440) */
+      > a:any-link {
+        display: block;
+      }
+    }
+
+    a:any-link {
+      color: var(--link-color);
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    a:any-link:hover,
+    a:any-link:focus-visible {
+      color: var(--link-hover-color);
+      text-decoration: underline;
+    }
+  }
+}
+
+@media (width >= 768px) {
+  .cards-services {
+    .cards-services-list {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .cards-services-card {
+      padding: 0 12px;
+    }
+
+    .cards-services-body > p:last-child:has(> a:only-child) {
+      padding-top: 8px;
+    }
+  }
+}

@@ -1,0 +1,121 @@
+/*
+ * columns-offer: FedEx "featured offer" panel (source: .featured_offer_v2 .fxg-featured-offer)
+ * Values measured with getComputedStyle on https://www.fedex.com/en-us/home.html at 375px and 1440px.
+ */
+.columns-offer {
+  box-sizing: border-box;
+  max-width: var(--grid-container-width);
+
+  /*
+   * source: panel margin 16px (top/bottom) sits inside its grid column, so it never
+   * collapses with the section title margin; plus a 1px empty column_control below.
+   * Padding + content-box background reproduces that without margin collapsing.
+   */
+  margin: 0 auto;
+  padding: 16px 0 17px;
+  background-color: var(--panel-grey);
+  background-clip: content-box;
+  color: var(--text-color);
+
+  /* mobile: image on top, text below (source uses flex column-reverse) */
+  .columns-offer-row {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .columns-offer-text {
+    box-sizing: border-box;
+    min-width: 0;
+    margin: 0 0 20px;
+    padding: 25px 15px;
+
+    > :first-child {
+      margin-top: 0;
+    }
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+
+    :is(h2, h3, h4) {
+      /* source: title margin-bottom 2px + non-collapsing 4px richtext margin = 6px */
+      margin: 0 0 6px;
+      font-size: var(--heading-size-m);
+      font-weight: 300;
+      line-height: var(--heading-line-height);
+      letter-spacing: -0.4px;
+      color: var(--text-color);
+    }
+
+    p {
+      margin: 4px 0 24px;
+      font-size: var(--body-font-size-m);
+      font-weight: 300;
+      line-height: 24px;
+      letter-spacing: -0.1px;
+      color: var(--text-color);
+    }
+
+    /* CTA text link ("Watch webinar"): blue, bold, uppercase — not a button */
+    p:has(> a:only-child) {
+      margin: 0;
+    }
+
+    p > a:only-child {
+      display: block;
+      font-size: var(--body-font-size-s);
+      font-weight: 700;
+      line-height: var(--heading-line-height);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--link-color);
+
+      &:hover,
+      &:focus-visible {
+        color: var(--link-hover-color);
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .columns-offer-media {
+    order: -1;
+
+    picture {
+      display: block;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+  }
+}
+
+/* desktop: text 56% | image 44%, image keeps its ratio and sits at the top (grey shows below) */
+@media (width >= 992px) {
+  .columns-offer {
+    .columns-offer-row {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+
+    .columns-offer-text {
+      flex: 0 0 56%;
+      margin: 0;
+      padding: 35px 60px 34px;
+    }
+
+    .columns-offer-media {
+      flex: 0 0 44%;
+      order: 0;
+    }
+
+    .columns-offer-row:has(> .columns-offer-media:first-child) .columns-offer-text {
+      order: 1;
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "id": "columns-offer",
+  "name": "columns-offer",
+  "variantName": "columns-offer",
+  "type": "columns",
+  "baseBlock": "columns",
+  "canonicalModel": "standalone",
+  "version": "1.0.0",
+  "created": "2026-09-29T06:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.fedex.com/en-us/home.html",
+    "discoveredDuring": "site-migration-per-page",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "colorSchemeDetail": "light-grey panel",
+    "density": "moderate",
+    "imagePattern": "single",
+    "imagePatternDetail": "edge-to-edge-right",
+    "purpose": "featured-offer",
+    "structure": "title + text + CTA | image",
+    "hasGrid": true,
+    "position": "middle"
+  },
+  "contentPattern": {
+    "structure": "2 columns, 1 row: [h3 title, p text, p link] [image]",
+    "buttonCount": 1,
+    "imageCount": 1
+  },
+  "options": [],
+  "memberVariantIds": ["columns-offer"],
+  "usage": {
+    "pagesUsing": [
+      { "url": "https://www.fedex.com/en-us/home.html", "instanceId": null, "screenshot": "migration-work/screenshot.png" }
+    ],
+    "reuseCount": 1,
+    "lastUsed": "2026-09-29T06:00:00.000Z"
+  }
+}

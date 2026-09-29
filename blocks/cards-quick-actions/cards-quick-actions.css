@@ -1,0 +1,166 @@
+/* Quick-actions panel: #f2f2f2 rounded panel overlapping the bottom of the hero */
+.cards-quick-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  max-width: var(--grid-container-width);
+  margin: -74px auto 0;
+  padding: 32px 8px;
+  border-radius: 24px;
+  background-color: var(--panel-grey-dark);
+  color: var(--text-color);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: normal;
+
+  .cards-quick-actions-list {
+    display: flex;
+    flex: 1 1 100%;
+    justify-content: space-evenly;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cards-quick-actions-item {
+    flex: 1 1 0;
+    min-width: 0;
+    margin: 0;
+  }
+
+  .cards-quick-actions-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: inherit;
+    text-align: center;
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      color: inherit;
+      text-decoration: none;
+    }
+  }
+
+  .cards-quick-actions-icon {
+    display: flex;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+
+    svg,
+    img {
+      display: block;
+      width: 32px;
+      height: 32px;
+      vertical-align: top;
+    }
+  }
+
+  .cards-quick-actions-label > span {
+    display: block;
+  }
+
+  .cards-quick-actions-track {
+    display: flex;
+    flex: 1 1 100%;
+    min-width: 0;
+    margin: 0;
+
+    input {
+      flex: 1 1 0%;
+      min-width: 0;
+      box-sizing: border-box;
+      height: 56px;
+      margin: 0;
+      padding: 1px 2px 1px 8px;
+      border: 1px solid var(--input-border-color);
+      border-radius: 0;
+      background-color: #fff;
+      color: #000;
+      font-size: 16px;
+      font-weight: 300;
+      line-height: 18.4px;
+
+      &::placeholder {
+        color: var(--text-color);
+        font-style: italic;
+        opacity: 1;
+      }
+    }
+
+    button {
+      display: flex;
+      flex: none;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      height: 56px;
+      margin: 0;
+      padding: 0 24px;
+      border: 0;
+      border-radius: 0;
+      background-color: var(--brand-orange);
+      color: #fff;
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 24.7px;
+      letter-spacing: 0.95px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition:
+        background-color 0.2s cubic-bezier(0.23, 1, 0.32, 1),
+        box-shadow 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+
+      &:hover {
+        background-color: var(--brand-orange-hover);
+        box-shadow: 0 0 0 2px var(--brand-orange-hover);
+      }
+
+      /* Source keeps the orange fill on focus and draws a white + purple double ring */
+      &:focus-visible {
+        border-radius: 6px;
+        outline: none;
+        box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--brand-purple);
+      }
+    }
+  }
+}
+
+@media (width >= 600px) {
+  .cards-quick-actions {
+    gap: 16px;
+    padding: 32px 40px;
+  }
+}
+
+@media (width >= 768px) {
+  .cards-quick-actions {
+    flex-wrap: nowrap;
+    gap: 40px;
+    margin-top: -70px;
+
+    .cards-quick-actions-list {
+      flex: 1 1 0%;
+      justify-content: space-around;
+      gap: 8px;
+    }
+
+    .cards-quick-actions-track {
+      flex: none;
+
+      input {
+        flex: none;
+        width: 226px;
+      }
+    }
+  }
+}
