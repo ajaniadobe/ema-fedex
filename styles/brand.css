@@ -11,6 +11,11 @@
   --link-hover-color: #00689c;
   --brand-orange: #ff6200;
   --brand-orange-hover: #e45528;
+
+  /* accessible orange for button text/fills: FedEx's darker orange meets 3:1 for large bold text
+     on white and on the #fafafa panel (brand #ff6200 is only 2.87:1 there) */
+  --button-orange: #e45528;
+  --button-orange-hover: #c84500;
   --brand-purple: #4d148c;
   --panel-grey: #fafafa;
   --panel-grey-dark: #f2f2f2;
