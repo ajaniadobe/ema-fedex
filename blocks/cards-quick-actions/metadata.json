@@ -1,0 +1,40 @@
+{
+  "id": "cards-quick-actions",
+  "name": "cards-quick-actions",
+  "variantName": "cards-quick-actions",
+  "type": "cards",
+  "baseBlock": "cards",
+  "canonicalModel": "standalone",
+  "version": "1.0.0",
+  "created": "2026-09-29T06:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.fedex.com/en-us/home.html",
+    "discoveredDuring": "site-migration-per-page",
+    "blockPosition": "top"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "colorSchemeDetail": "light-grey panel",
+    "density": "moderate",
+    "densityDetail": "compact",
+    "imagePattern": "icon",
+    "purpose": "quick-actions",
+    "structure": "4 icon links + tracking input + button",
+    "hasGrid": true,
+    "position": "top"
+  },
+  "contentPattern": {
+    "structure": "2 columns per row: [icon image] [label link]; final row: single cell 'Track' with placeholder text 'Tracking number' and link to https://www.fedex.com/fedextrack/ (block JS renders input + button, submits ?trknbr=)",
+    "buttonCount": 1,
+    "imageCount": 4
+  },
+  "options": [],
+  "memberVariantIds": ["cards-quick-actions"],
+  "usage": {
+    "pagesUsing": [
+      { "url": "https://www.fedex.com/en-us/home.html", "instanceId": null, "screenshot": "migration-work/screenshot.png" }
+    ],
+    "reuseCount": 1,
+    "lastUsed": "2026-09-29T06:00:00.000Z"
+  }
+}

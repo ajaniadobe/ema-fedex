@@ -1,0 +1,124 @@
+/* panel background (#fafafa) is painted by .section.grey > .block-content */
+.columns-features {
+  .columns-features-row {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .columns-features-text {
+    min-width: 0;
+    padding: 0 15px;
+
+    h2 {
+      margin: 24px 0 16px;
+      padding-inline: 15px;
+      font-size: var(--heading-size-m);
+      font-weight: 300;
+      line-height: var(--heading-line-height);
+      letter-spacing: -0.4px;
+      color: var(--text-color);
+    }
+  }
+
+  .columns-features-grid {
+    display: grid;
+    gap: 8px 24px;
+    padding-inline: 15px;
+  }
+
+  /* source groups items in rows of two with a 13px spacer between rows */
+  .columns-features-item:nth-child(2n + 3) {
+    margin-top: 5px;
+  }
+
+  .columns-features-item > p {
+    margin: 4px 0 8px;
+    font-size: var(--body-font-size-m);
+    line-height: 24px;
+    font-weight: 300;
+    letter-spacing: -0.1px;
+  }
+
+  .columns-features-item strong {
+    font-weight: 700;
+  }
+
+  .columns-features-item sup {
+    position: relative;
+    top: -6px;
+    font-size: var(--body-font-size-xs);
+    line-height: 0;
+    vertical-align: baseline;
+  }
+
+  .columns-features-notes > p {
+    margin: 4px 0 8px;
+    font-size: var(--body-font-size-xs);
+    line-height: 24px;
+    font-weight: 400;
+  }
+
+  .columns-features-item a,
+  .columns-features-notes a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .columns-features-media {
+    order: -1;
+    padding: 20px 15px 0;
+
+    > p {
+      margin: 0;
+    }
+
+    picture {
+      display: block;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  }
+}
+
+@media (width >= 768px) {
+  .columns-features {
+    .columns-features-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+
+    .columns-features-text {
+      padding: 0 12px;
+
+      h2 {
+        margin: 36px 0 24px;
+        padding-inline: 12px;
+        font-size: var(--heading-size-l);
+      }
+    }
+
+    .columns-features-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 13px 24px;
+      padding-inline: 12px;
+    }
+
+    .columns-features-item:nth-child(2n + 3) {
+      margin-top: 0;
+    }
+
+    .columns-features-notes {
+      margin-top: 13px;
+    }
+
+    .columns-features-media {
+      order: 0;
+      padding: 40px 12px 0;
+    }
+  }
+}

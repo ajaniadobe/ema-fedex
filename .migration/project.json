@@ -1,0 +1,10 @@
+{
+  "sites": {
+    "ema-fedex": {
+      "previewOrg": "ajaniadobe",
+      "previewSite": "ema-fedex",
+      "contentHostUrl": "https://content.da.live/ajaniadobe/ema-fedex/",
+      "botProtected": true
+    }
+  }
+}

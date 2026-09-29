@@ -1,0 +1,39 @@
+{
+  "id": "hero-video",
+  "name": "hero-video",
+  "variantName": "hero-video",
+  "type": "hero",
+  "baseBlock": "hero",
+  "canonicalModel": "standalone",
+  "version": "1.0.0",
+  "created": "2026-09-29T06:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.fedex.com/en-us/home.html",
+    "discoveredDuring": "site-migration-per-page",
+    "blockPosition": "top"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "dark",
+    "density": "minimal",
+    "imagePattern": "background",
+    "imagePatternDetail": "background-video",
+    "purpose": "brand-hero",
+    "structure": "video + heading + CTA",
+    "isFullWidth": true,
+    "position": "top"
+  },
+  "contentPattern": {
+    "structure": "1 column, rows: [poster image + link to desktop mp4 (optional 2nd link for mobile mp4)] / [h1, CTA link]",
+    "buttonCount": 1,
+    "imageCount": 1
+  },
+  "options": [],
+  "memberVariantIds": ["hero-video"],
+  "usage": {
+    "pagesUsing": [
+      { "url": "https://www.fedex.com/en-us/home.html", "instanceId": null, "screenshot": "migration-work/screenshot.png" }
+    ],
+    "reuseCount": 1,
+    "lastUsed": "2026-09-29T06:00:00.000Z"
+  }
+}

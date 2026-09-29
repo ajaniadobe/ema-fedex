@@ -1,0 +1,38 @@
+{
+  "id": "notification-info",
+  "name": "notification-info",
+  "variantName": "notification-info",
+  "type": "notification",
+  "baseBlock": "notification",
+  "canonicalModel": "standalone",
+  "version": "1.0.0",
+  "created": "2026-09-29T06:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.fedex.com/en-us/home.html",
+    "discoveredDuring": "site-migration-per-page",
+    "blockPosition": "top"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "colorSchemeDetail": "pale-blue with blue border",
+    "density": "minimal",
+    "imagePattern": "icon",
+    "imagePatternDetail": "info-icon",
+    "purpose": "informational-alert",
+    "structure": "icon + text + link"
+  },
+  "contentPattern": {
+    "structure": "1 column, 1 row: [paragraph with inline link]",
+    "buttonCount": 0,
+    "imageCount": 0
+  },
+  "options": [],
+  "memberVariantIds": ["notification-info"],
+  "usage": {
+    "pagesUsing": [
+      { "url": "https://www.fedex.com/en-us/home.html", "instanceId": null, "screenshot": "migration-work/screenshot.png" }
+    ],
+    "reuseCount": 1,
+    "lastUsed": "2026-09-29T06:00:00.000Z"
+  }
+}

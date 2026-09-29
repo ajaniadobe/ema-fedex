@@ -1,0 +1,31 @@
+/* FedEx brand tokens — extracted from https://www.fedex.com/en-us/home.html (1440px viewport) */
+:root {
+  /* FedEx Sans is proprietary (self-hosted by fedex.com); Arial is FedEx's own fallback */
+  --heading-font-family: fedexsans, arial, sans-serif;
+  --body-font-family: fedexsans, arial, sans-serif;
+
+  /* colors */
+  --background-color: #fff;
+  --text-color: #333;
+  --link-color: #007ab7;
+  --link-hover-color: #00689c;
+  --brand-orange: #ff6200;
+  --brand-orange-hover: #e45528;
+  --brand-purple: #4d148c;
+  --panel-grey: #fafafa;
+  --panel-grey-dark: #f2f2f2;
+  --notification-bg: #f8fbfd;
+  --input-border-color: #8e8e8e;
+
+  /* layout */
+  --content-max-width: 970px;
+  --section-spacing: 40px;
+
+  /* headings (desktop) */
+  --heading-size-xxl: 46px;
+  --heading-size-xl: 40px;
+  --heading-size-l: 32px;
+  --heading-size-m: 24px;
+  --heading-size-s: 19px;
+  --heading-size-xs: 16px;
+}

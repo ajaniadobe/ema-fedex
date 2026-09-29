@@ -40,6 +40,24 @@ const decorateArea = ({ area = document }) => {
   };
 
   eagerLoad(area, 'img');
+
+  // Unprocessed section-metadata tables (raw .plain.html, e.g. local preview) -> section attrs,
+  // matching what the delivery pipeline does: "style" becomes classes, other keys data-*.
+  area.querySelectorAll(':scope main > div > .section-metadata, :scope > div > .section-metadata').forEach((meta) => {
+    const section = meta.parentElement;
+    [...meta.children].forEach((row) => {
+      const [key, value] = [...row.children].map((cell) => cell.textContent.trim());
+      if (!key || !value) return;
+      const name = key.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      if (name === 'style') {
+        value.split(',').map((s) => s.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-'))
+          .filter(Boolean).forEach((cls) => section.classList.add(cls));
+      } else {
+        section.dataset[name.replace(/-([a-z0-9])/g, (_, c) => c.toUpperCase())] = value;
+      }
+    });
+    meta.remove();
+  });
 };
 
 export async function loadPage() {

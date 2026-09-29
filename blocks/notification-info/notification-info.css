@@ -1,0 +1,61 @@
+/* FedEx informational notification bar (.fxg-notifications--theme-informational) */
+.notification-info {
+  display: flex;
+  box-sizing: border-box;
+  max-width: min(960px, var(--grid-container-width));
+  margin-inline: auto;
+  padding: 16px 16px 16px 0;
+  border: 1px solid var(--link-color);
+  border-inline-start-width: 4px;
+  background-color: var(--notification-bg);
+  color: var(--text-color);
+  font-size: 16px;
+  line-height: 24px;
+
+  .notification-info-icon {
+    flex: none;
+    padding: 0 8px;
+
+    svg {
+      display: block;
+      width: 32px;
+      height: 32px;
+      fill: var(--link-color);
+    }
+  }
+
+  .notification-info-message {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-top: 8px;
+    font-weight: 300;
+    letter-spacing: -0.1px;
+
+    > * {
+      margin: 0;
+    }
+
+    /* source rich-text paragraphs: margin 4px 0 0 */
+    > * + * {
+      margin-top: 4px;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: underline;
+
+      &:hover,
+      &:focus-visible {
+        color: var(--link-color);
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+/* source switches icon gutter from 8px to 16px at 664px */
+@media (width >= 664px) {
+  .notification-info .notification-info-icon {
+    padding-inline: 16px;
+  }
+}

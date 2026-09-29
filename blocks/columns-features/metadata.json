@@ -1,0 +1,40 @@
+{
+  "id": "columns-features",
+  "name": "columns-features",
+  "variantName": "columns-features",
+  "type": "columns",
+  "baseBlock": "columns",
+  "canonicalModel": "standalone",
+  "version": "1.0.0",
+  "created": "2026-09-29T06:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.fedex.com/en-us/home.html",
+    "discoveredDuring": "site-migration-per-page",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "colorSchemeDetail": "light-grey",
+    "density": "moderate",
+    "imagePattern": "large",
+    "imagePatternDetail": "large-image-right",
+    "purpose": "value-proposition",
+    "structure": "heading + 2x2 features + footnotes | image",
+    "hasGrid": true,
+    "position": "middle"
+  },
+  "contentPattern": {
+    "structure": "2 columns, 1 row: [h2 'Why ship with FedEx?', 4 x (p><strong>title</strong> + p text), footnote paragraphs] [image]",
+    "buttonCount": 0,
+    "imageCount": 1
+  },
+  "options": [],
+  "memberVariantIds": ["columns-features"],
+  "usage": {
+    "pagesUsing": [
+      { "url": "https://www.fedex.com/en-us/home.html", "instanceId": null, "screenshot": "migration-work/screenshot.png" }
+    ],
+    "reuseCount": 1,
+    "lastUsed": "2026-09-29T06:00:00.000Z"
+  }
+}

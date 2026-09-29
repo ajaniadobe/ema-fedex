@@ -1,0 +1,39 @@
+{
+  "id": "cards-services",
+  "name": "cards-services",
+  "variantName": "cards-services",
+  "type": "cards",
+  "baseBlock": "cards",
+  "canonicalModel": "standalone",
+  "version": "1.0.0",
+  "created": "2026-09-29T06:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.fedex.com/en-us/home.html",
+    "discoveredDuring": "site-migration-per-page",
+    "blockPosition": "middle"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "moderate",
+    "imagePattern": "multiple",
+    "imagePatternDetail": "landscape-top",
+    "purpose": "service-highlights",
+    "structure": "image + title + text + CTA (3-up grid)",
+    "hasGrid": true,
+    "position": "middle"
+  },
+  "contentPattern": {
+    "structure": "2 columns per row (3 rows): [image] [h3 title, p text, p link]",
+    "buttonCount": 3,
+    "imageCount": 3
+  },
+  "options": [],
+  "memberVariantIds": ["cards-services"],
+  "usage": {
+    "pagesUsing": [
+      { "url": "https://www.fedex.com/en-us/home.html", "instanceId": null, "screenshot": "migration-work/screenshot.png" }
+    ],
+    "reuseCount": 1,
+    "lastUsed": "2026-09-29T06:00:00.000Z"
+  }
+}
