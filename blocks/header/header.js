@@ -1,5 +1,6 @@
 /*
- * Header block: builds the site header from the authored nav fragment (nav.plain.html).
+ * Header block: builds the site header from the authored fragment (/fragments/nav/header, or the
+ * page's `header-source` metadata; see scripts/utils/site-fragment.js).
  *
  * Fragment contract (flat, semantic):
  *   section 1: brand link (logo image)
@@ -12,21 +13,11 @@
  *   <li><p>text with <a>link</a></p></li> -> note paragraph
  */
 
+import fetchSiteFragment from '../../scripts/utils/site-fragment.js';
+
 const DESKTOP = window.matchMedia('(width >= 1024px)');
 
-async function fetchNav() {
-  // metadata-independent: /content first (local preview), then site root (DA/EDS)
-  let resp = await fetch('/content/nav.plain.html');
-  if (!resp.ok) resp = await fetch('/nav.plain.html');
-  if (!resp.ok) return null;
-  const wrapper = document.createElement('div');
-  wrapper.innerHTML = await resp.text();
-  // relative media paths in the fragment resolve against the fragment, not the page
-  wrapper.querySelectorAll('img[src]').forEach((img) => {
-    img.src = new URL(img.getAttribute('src'), resp.url).href;
-  });
-  return wrapper;
-}
+const fetchNav = () => fetchSiteFragment('header', '/fragments/nav/header');
 
 function setMenuOpen(header, open) {
   header.classList.toggle('is-menu-open', open);

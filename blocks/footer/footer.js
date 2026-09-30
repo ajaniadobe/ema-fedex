@@ -1,5 +1,6 @@
 /*
- * Footer block: builds the site footer from the authored fragment (footer.plain.html).
+ * Footer block: builds the site footer from the authored fragment (/fragments/nav/footer, or the
+ * page's `footer-source` metadata; see scripts/utils/site-fragment.js).
  *
  * Fragment contract (flat, semantic):
  *   section 1: link columns - each <h2> starts a column; the lists after it are its sub-columns
@@ -8,19 +9,9 @@
  *   section 4: copyright - <p>text</p> + <ul> of legal links
  */
 
-async function fetchFooter() {
-  // metadata-independent: /content first (local preview), then site root (DA/EDS)
-  let resp = await fetch('/content/footer.plain.html');
-  if (!resp.ok) resp = await fetch('/footer.plain.html');
-  if (!resp.ok) return null;
-  const wrapper = document.createElement('div');
-  wrapper.innerHTML = await resp.text();
-  // relative media paths in the fragment resolve against the fragment, not the page
-  wrapper.querySelectorAll('img[src]').forEach((img) => {
-    img.src = new URL(img.getAttribute('src'), resp.url).href;
-  });
-  return wrapper;
-}
+import fetchSiteFragment from '../../scripts/utils/site-fragment.js';
+
+const fetchFooter = () => fetchSiteFragment('footer', '/fragments/nav/footer');
 
 function el(tag, className) {
   const node = document.createElement(tag);

@@ -32,7 +32,7 @@ async function mountFooter({ contentOk = true } = {}) {
   requested = [];
   window.fetch = async (path) => {
     requested.push(path);
-    const ok = path === '/content/footer.plain.html' ? contentOk : true;
+    const ok = path === '/content/fragments/nav/footer.plain.html' ? contentOk : true;
     return {
       ok,
       url: new URL(path, window.location.origin).href,
@@ -52,14 +52,14 @@ afterEach(() => {
 });
 
 describe('footer source', () => {
-  it('loads /content/footer.plain.html first', async () => {
+  it('loads /content/fragments/nav/footer.plain.html first', async () => {
     await mountFooter();
-    expect(requested).to.deep.equal(['/content/footer.plain.html']);
+    expect(requested).to.deep.equal(['/content/fragments/nav/footer.plain.html']);
   });
 
-  it('falls back to /footer.plain.html when the content path is missing', async () => {
+  it('falls back to /fragments/nav/footer.plain.html when the content path is missing', async () => {
     await mountFooter({ contentOk: false });
-    expect(requested).to.deep.equal(['/content/footer.plain.html', '/footer.plain.html']);
+    expect(requested).to.deep.equal(['/content/fragments/nav/footer.plain.html', '/fragments/nav/footer.plain.html']);
   });
 });
 
@@ -83,7 +83,7 @@ describe('footer structure', () => {
 
   it('resolves fragment-relative images against the fragment URL', async () => {
     const el = await mountFooter();
-    expect(el.querySelector('.footer-country-icon').src).to.equal(new URL('/content/images/globe.svg', window.location.origin).href);
+    expect(el.querySelector('.footer-country-icon').src).to.equal(new URL('/content/fragments/nav/images/globe.svg', window.location.origin).href);
   });
 });
 

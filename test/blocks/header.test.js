@@ -41,7 +41,7 @@ async function mountHeader({ contentOk = true } = {}) {
   requested = [];
   window.fetch = async (path) => {
     requested.push(path);
-    const ok = path === '/content/nav.plain.html' ? contentOk : true;
+    const ok = path === '/content/fragments/nav/header.plain.html' ? contentOk : true;
     return {
       ok,
       url: new URL(path, window.location.origin).href,
@@ -63,20 +63,33 @@ afterEach(() => {
 });
 
 describe('header nav source', () => {
-  it('loads /content/nav.plain.html first', async () => {
+  it('loads /content/fragments/nav/header.plain.html first', async () => {
     await mountHeader();
-    expect(requested).to.deep.equal(['/content/nav.plain.html']);
+    expect(requested).to.deep.equal(['/content/fragments/nav/header.plain.html']);
   });
 
-  it('falls back to /nav.plain.html when the content path is missing', async () => {
+  it('falls back to /fragments/nav/header.plain.html when the content path is missing', async () => {
     await mountHeader({ contentOk: false });
-    expect(requested).to.deep.equal(['/content/nav.plain.html', '/nav.plain.html']);
+    expect(requested).to.deep.equal(['/content/fragments/nav/header.plain.html', '/fragments/nav/header.plain.html']);
+  });
+
+  it('uses header-source metadata, normalised to a bare path', async () => {
+    const meta = document.createElement('meta');
+    meta.name = 'header-source';
+    meta.content = '/content/fragments/nav/header-alt.plain.html';
+    document.head.append(meta);
+    try {
+      await mountHeader({ contentOk: false });
+      expect(requested).to.deep.equal(['/content/fragments/nav/header-alt.plain.html']);
+    } finally {
+      meta.remove();
+    }
   });
 
   it('resolves fragment-relative images against the fragment URL', async () => {
     const el = await mountHeader();
     const img = el.querySelector('.nav-brand img');
-    expect(img.src).to.equal(new URL('/content/images/logo.png', window.location.origin).href);
+    expect(img.src).to.equal(new URL('/content/fragments/nav/images/logo.png', window.location.origin).href);
   });
 });
 
