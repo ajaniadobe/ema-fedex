@@ -28,7 +28,7 @@ const originalFetch = window.fetch;
 const mounted = [];
 let requested;
 
-async function mountFooter({ contentOk = true } = {}) {
+async function mountFooter({ contentOk = true, html = FOOTER_HTML } = {}) {
   requested = [];
   window.fetch = async (path) => {
     requested.push(path);
@@ -36,7 +36,7 @@ async function mountFooter({ contentOk = true } = {}) {
     return {
       ok,
       url: new URL(path, window.location.origin).href,
-      text: async () => FOOTER_HTML,
+      text: async () => html,
     };
   };
   const el = document.createElement('footer');
@@ -97,5 +97,43 @@ describe('footer language dropdown', () => {
     expect(toggle.getAttribute('aria-expanded')).to.equal('true');
     toggle.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     expect(toggle.getAttribute('aria-expanded')).to.equal('false');
+  });
+});
+
+// Publishing splits a link that mixes text and an icon: only the icon stays linked
+const PUBLISHED_HTML = FOOTER_HTML
+  .replace(
+    '<ul><li><a href="/terms">Terms of Use</a></li></ul>',
+    '<ul><li><a href="/terms">Terms of Use</a></li><li><p>Your Privacy Choices</p><p><a href="/privacy"><picture><img src="images/privacy.svg" alt=""></picture></a></p></li></ul>',
+  )
+  .replace(
+    '<p><a href="/?location=home"><img src="images/globe.svg" alt=""> United States</a></p>',
+    '<p><a href="/?location=home"><picture><img src="images/globe.svg" alt=""></picture></a> United States</p>',
+  );
+
+describe('footer published links', () => {
+  it('rejoins text from a sibling paragraph into its icon-only link', async () => {
+    const el = await mountFooter({ html: PUBLISHED_HTML });
+    const link = el.querySelector('a[href="/privacy"]');
+    expect(link.textContent.trim()).to.equal('Your Privacy Choices');
+    expect(link.firstChild.textContent).to.equal('Your Privacy Choices');
+    expect(link.querySelector('img')).to.exist;
+    expect(link.parentElement.tagName).to.equal('LI');
+    expect(link.parentElement.querySelectorAll('p').length).to.equal(0);
+  });
+
+  it('rejoins trailing text in the same paragraph into the country link', async () => {
+    const el = await mountFooter({ html: PUBLISHED_HTML });
+    const country = el.querySelector('.footer-country');
+    expect(country.textContent.trim()).to.equal('United States');
+    expect(country.querySelector('.footer-country-icon')).to.exist;
+    expect(country.lastChild.textContent.trim()).to.equal('United States');
+  });
+
+  it('leaves links that already have a name alone', async () => {
+    const el = await mountFooter({ html: PUBLISHED_HTML });
+    const social = el.querySelector('a[href="https://social.example.com/"]');
+    expect(social.textContent.trim()).to.equal('');
+    expect(el.querySelector('.footer-social-label').textContent).to.equal('Follow Us');
   });
 });

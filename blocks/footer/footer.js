@@ -19,6 +19,35 @@ function el(tag, className) {
   return node;
 }
 
+const hasName = (a) => a.textContent.trim() || a.getAttribute('aria-label')
+  || [...a.querySelectorAll('img')].some((img) => img.alt.trim());
+const isText = (n) => n.nodeType === Node.TEXT_NODE && n.textContent.trim();
+// n and a are never ancestor/descendant here, so the position is exactly preceding or following
+const isBefore = (n, a) => a.compareDocumentPosition(n) === Node.DOCUMENT_POSITION_PRECEDING;
+
+// Publishing splits a link that mixes text and an icon: only the icon stays linked and its text
+// lands beside it, in the same paragraph or a text-only paragraph of the same list item.
+// Pull that text back into the nameless link, keeping the authored order.
+function rejoinSplitLinks(root) {
+  root.querySelectorAll('a').forEach((a) => {
+    if (hasName(a)) return;
+    const p = a.parentElement;
+    const item = p?.tagName === 'P' && p.parentElement?.tagName === 'LI' ? p.parentElement : null;
+    let pieces = [...p.childNodes].filter((n) => n !== a && isText(n));
+    if (!pieces.length && item) {
+      pieces = [...item.children].filter((c) => c !== p && c.tagName === 'P' && !c.querySelector('a') && c.textContent.trim());
+    }
+    const before = pieces.filter((n) => isBefore(n, a));
+    const after = pieces.filter((n) => !isBefore(n, a));
+    const content = (n) => (n.nodeType === Node.TEXT_NODE ? [n] : [...n.childNodes]);
+    a.prepend(...before.flatMap(content));
+    a.append(...after.flatMap(content));
+    pieces.forEach((n) => { if (n.nodeType === Node.ELEMENT_NODE) n.remove(); });
+    // a list item left holding a single paragraph gets the link directly, like the authored markup
+    if (item && item.children.length === 1) p.replaceWith(...p.childNodes);
+  });
+}
+
 // <h2> + following <ul>s -> one column with sub-columns
 function buildColumns(section) {
   const columns = el('div', 'footer-columns');
@@ -132,6 +161,7 @@ function buildLabelledList(section, className) {
 export default async function init(block) {
   const fragment = await fetchFooter();
   if (!fragment) return;
+  rejoinSplitLinks(fragment);
   const [links, locale, social, copyright] = fragment.querySelectorAll(':scope > div');
 
   // three full-width bands (links + locale, social, copyright), each with a centered content column
