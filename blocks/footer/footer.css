@@ -1,57 +1,424 @@
+/* FedEx footer — values measured from fedex.com. Mobile-first: stacked columns,
+   multi-column layout from 768px (the width at which fedex.com switches). */
 footer {
-  a {
-    text-decoration: none;
-  }
+  --footer-bg: var(--panel-grey);
+  --footer-rule: rgb(89 89 91 / 50%);
+  --footer-sprite: url("footer-sprite.png");
 
-  .footer-content {
-    max-width: var(--grid-container-width);
-    margin: 48px auto;
-    font-size: 14px;
-  }
+  display: block;
+  background-color: var(--footer-bg);
+  color: var(--text-color);
+  font-family: var(--body-font-family);
+  font-weight: 400;
+  letter-spacing: normal;
 
-  .section-legal ul {
+  ul {
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  .section-copyright p {
+  li,
+  p,
+  h2 {
     margin: 0;
   }
 
-  .section {
-    .default-content {
-      max-width: initial;
-      margin: initial;
+  a {
+    color: var(--text-color);
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--text-color);
+      text-decoration: underline;
+    }
+  }
+
+  .footer-band-primary {
+    padding-top: 31px;
+  }
+
+  .footer-primary,
+  .footer-social {
+    box-sizing: border-box;
+    max-width: var(--grid-container-width);
+    margin: 0 auto;
+  }
+
+  .footer-primary {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 23px;
+  }
+
+  .footer-columns {
+    display: flex;
+    flex-direction: column;
+    gap: 23px;
+  }
+
+  /* column titles: 700 12px uppercase purple */
+  .footer-column-title {
+    padding-left: 3px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 15.6px;
+    letter-spacing: 0.75px;
+    color: var(--brand-purple);
+    text-transform: uppercase;
+  }
+
+  .footer-column-lists {
+    margin-top: 11px;
+
+    li {
+      margin-top: 13.5px;
+    }
+
+    ul:first-child li:first-child {
+      margin-top: 0;
+    }
+  }
+
+  .footer-column-lists a {
+    display: block;
+    padding: 4px 0;
+    font-size: 12px;
+    line-height: 15.6px;
+
+    img {
+      display: inline-block;
+      width: 30px;
+      height: 14px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+  }
+
+  /* locale: globe + country link, bordered language dropdown */
+  .footer-locale {
+    padding-left: 0;
+  }
+
+  .footer-country {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    line-height: 25px;
+
+    .footer-country-icon {
+      width: 25px;
+      height: 23px;
+    }
+
+    &:hover,
+    &:focus-visible {
+      text-decoration: none;
+    }
+  }
+
+  .footer-language {
+    position: relative;
+    margin: 15px 0;
+    border: 1px solid var(--footer-rule);
+  }
+
+  .footer-language-toggle {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 18px 15px 17px;
+    border: 1px solid var(--footer-bg);
+    background: none;
+    color: #000;
+    font: inherit;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 24px;
+    text-align: left;
+    cursor: pointer;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 16px;
+      width: 20px;
+      height: 12px;
+      margin-top: -6px;
+      background: var(--footer-sprite) -367px 0 / 406.67px 30px no-repeat;
+      transition: transform 0.2s;
+    }
+  }
+
+  .footer-language.is-open .footer-language-toggle::after {
+    transform: rotate(180deg);
+  }
+
+  .footer-language-list {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: -1px;
+    right: -1px;
+    z-index: 2;
+    border: 1px solid var(--footer-rule);
+    background-color: var(--footer-bg);
+
+    a {
+      display: block;
+      padding: 15px;
+      background-color: #fff;
+      font-size: 16px;
+      line-height: 24px;
+
+      &:hover,
+      &:focus-visible {
+        background-color: var(--footer-bg);
+        text-decoration: none;
+      }
+    }
+  }
+
+  .footer-language.is-open .footer-language-list {
+    display: block;
+  }
+
+  /* social: label above a row of 45px icons that scrolls sideways on small screens */
+  .footer-social {
+    position: relative;
+    padding: 37px 0 72px;
+  }
+
+  .footer-social-label {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 15.6px;
+    letter-spacing: 0.75px;
+    color: var(--brand-purple);
+    text-transform: uppercase;
+  }
+
+  .footer-social-list {
+    display: flex;
+    gap: 25px;
+    max-width: 316px;
+    margin-top: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+
+    li {
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+    }
+
+    a {
+      display: block;
+      width: 45px;
+      height: 45px;
+
+      &:hover,
+      &:focus-visible {
+        text-decoration: none;
+      }
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  /* scroll buttons for the icon row (mobile) */
+  .footer-scroll {
+    position: absolute;
+    top: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 45px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--text-color);
+    cursor: pointer;
+
+    &[hidden] {
+      display: none;
+    }
+
+    svg {
+      width: 7px;
+      height: 12px;
+      fill: none;
+      stroke: currentcolor;
+      stroke-width: 1.5;
+    }
+  }
+
+  .footer-scroll-prev {
+    left: -6px;
+
+    svg {
+      transform: rotate(180deg);
+    }
+  }
+
+  .footer-scroll-next {
+    left: 319px;
+  }
+
+  /* purple copyright bar */
+  .footer-copyright {
+    background-color: var(--brand-purple);
+    color: #fff;
+  }
+
+  .footer-copyright-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 21px;
+    max-width: var(--grid-container-width);
+    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 35px 0 32px;
+    text-align: center;
+  }
+
+  .footer-copyright-inner-label {
+    font-size: 12px;
+    line-height: 15.6px;
+  }
+
+  .footer-copyright-inner-list {
+    display: flex;
+    align-items: center;
+
+    li + li::before {
+      content: "|";
+      padding: 0 13px 0 19px;
+      font-size: 16px;
+      line-height: 12px;
+    }
+
+    a {
+      font-size: 14px;
+      line-height: 24px;
+      color: #fff;
+
+      &:hover,
+      &:focus-visible {
+        color: #fff;
+      }
     }
   }
 }
 
-@media (width >= 900px) {
+/* breakpoint-exception: fedex.com switches the footer to columns at 768px */
+@media (width >= 768px) {
   footer {
-    margin: 0;
+    .footer-band-primary {
+      padding-top: 30px;
+    }
 
-    .section-legal {
-      display: flex;
-      justify-content: end;
-      gap: var(--spacing-xl);
-      margin-bottom: 24px;
+    .footer-primary {
+      flex-direction: row;
+      gap: 24px;
+      min-height: 185px;
+      padding: 0 9px 32px 3px;
 
-      ul {
-        display: flex;
-        justify-content: end;
-        gap: var(--spacing-xl);
-      }
-
-      li {
-        margin: 0;
+      /* divider inset 12px from the content column, as on fedex.com */
+      &::after {
+        content: "";
+        position: absolute;
+        inset: auto 12px 0;
+        border-top: 1px solid var(--footer-rule);
       }
     }
 
-    .section-copyright {
+    .footer-columns {
+      flex: 0 1 auto;
+      flex-direction: row;
+      gap: 21px;
+      min-width: 0;
+    }
+
+    .footer-column {
+      min-width: 0;
+    }
+
+    .footer-column:nth-child(2) {
+      margin-right: 3px;
+    }
+
+    .footer-column-lists {
       display: flex;
-      justify-content: end;
-      gap: var(--spacing-xl);
+      gap: 24px;
+      margin-top: 20px;
+
+      ul {
+        flex: 0 1 auto;
+        width: 102px;
+        min-width: 0;
+      }
+
+      li,
+      ul:first-child li:first-child {
+        margin-top: 0;
+      }
+    }
+
+    .footer-column:nth-child(2) .footer-column-lists ul {
+      width: 161px;
+    }
+
+    .footer-column:nth-child(3) .footer-column-lists ul {
+      width: 222px;
+    }
+
+    .footer-locale {
+      flex: 0 1 220px;
+      min-width: 160px;
+      margin-left: auto;
+    }
+
+    .footer-social {
+      display: flex;
+      align-items: center;
+      gap: 23px;
+      padding: 20px 9px 56px;
+    }
+
+    .footer-scroll {
+      display: none;
+    }
+
+    .footer-social-list {
+      gap: 14px;
+      max-width: none;
+      margin-top: 0;
+      overflow: visible;
+
+      a {
+        width: 30px;
+        height: 30px;
+      }
+    }
+
+    .footer-copyright-inner {
+      flex-flow: row wrap;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 62px;
+      padding: 19px 12px 19px 9px;
+      text-align: left;
     }
   }
 }

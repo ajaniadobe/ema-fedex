@@ -1,5 +1,3 @@
-@import url("brand.css");
-
 :root {
   /* grid */
   --grid-container-width: calc(100% - 30px);
@@ -109,8 +107,8 @@
   --color-link: var(--link-color);
   --color-link-hover: var(--link-hover-color);
   --color-brand: var(--brand-purple);
-  --color-accent: var(--brand-orange);
-  --color-accent-hover: var(--brand-orange-hover);
+  --color-accent: var(--button-orange);
+  --color-accent-hover: var(--button-orange-hover);
   --color-background: var(--background-color);
   --color-shaded: var(--panel-grey);
 
@@ -137,7 +135,7 @@
   --body-line-height: 1.5;
 
   /* misc */
-  --header-height: 64px;
+  --header-height: 66px;
   --breadcrumb-height: 24px;
 }
 
@@ -283,6 +281,19 @@ a {
       color: var(--color-red-600);
     }
   }
+}
+
+/* hidden visually, kept for assistive tech (focusable content becomes visible) */
+.visually-hidden:where(:not(:focus-within, :active)) {
+  position: absolute !important;
+  clip-path: inset(50%) !important;
+  overflow: hidden !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  white-space: nowrap !important;
 }
 
 .icon {
@@ -474,6 +485,7 @@ svg {
 @media (width >= 768px) {
   :root {
     --grid-container-width: 720px;
+    --header-height: 75px;
   }
 }
 

@@ -68,11 +68,29 @@ function decorateMedia(media, block) {
   frame.append(video);
   block.append(buildControls(video));
 
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  // Respect reduced motion and data saver: keep the poster, let the user opt in via Play.
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion || navigator.connection?.saveData) {
     video.dispatchEvent(new Event('pause'));
     return;
   }
-  video.play().catch(() => video.dispatchEvent(new Event('pause')));
+
+  // Pause while scrolled out of view (saves bandwidth/battery); never override a user pause.
+  let userPaused = false;
+  block.querySelector('.hero-video-play-toggle').addEventListener('click', () => {
+    userPaused = video.paused;
+  });
+  const start = () => {
+    new IntersectionObserver(([entry]) => {
+      if (userPaused) return;
+      if (entry.isIntersecting) video.play().catch(() => video.dispatchEvent(new Event('pause')));
+      else video.pause();
+    }).observe(block);
+  };
+
+  // Start the video only after the poster (the LCP image) has loaded, so they don't compete.
+  if (!img || img.complete) start();
+  else img.addEventListener('load', start, { once: true });
 }
 
 export default function init(el) {
@@ -87,7 +105,18 @@ export default function init(el) {
   heading?.classList.add('hero-video-heading');
   // Space after each <br> so CSS can hide the break on mobile without merging words.
   heading?.querySelectorAll('br').forEach((br) => br.after(' '));
-  content.querySelectorAll('a[href]').forEach((a) => a.classList.add('hero-video-cta'));
+  content.querySelectorAll('a[href]').forEach((a) => {
+    a.classList.add('hero-video-cta');
+    // Generic CTA text ("learn more") gets screen-reader-only context from the heading.
+    if (heading && /^(learn|read|see|find out|discover) more$/i.test(a.textContent.trim())) {
+      const context = document.createElement('span');
+      context.className = 'visually-hidden';
+      const label = heading.cloneNode(true);
+      label.querySelectorAll('sup').forEach((sup) => sup.remove());
+      context.textContent = ` about ${label.textContent.replace(/\s+/g, ' ').trim()}`;
+      a.append(context);
+    }
+  });
   const media = rows.pop();
   if (media) decorateMedia(media, el);
 }
