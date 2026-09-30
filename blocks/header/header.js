@@ -203,7 +203,10 @@ function decorateSearch(li, header, bar) {
     }
     window.location.href = `${link.href}${encodeURIComponent(q)}`;
   });
-  form.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+  // Escape closes the open search bar wherever focus is (the toggle is hidden while it is open)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && header.classList.contains('is-search-open')) setOpen(false);
+  });
 
   li.classList.add('nav-search-item');
   li.replaceChildren(toggle);
@@ -231,6 +234,23 @@ function decorateSkipLink(header, brand) {
   header.prepend(skip);
 }
 
+// Desktop: everything lives in the bar. Mobile: the account list stays in the bar and the
+// search + primary nav move into a full-width drawer under it.
+function placeForViewport(parts) {
+  const {
+    bar, nav, sections, tools, search, hamburger, drawer,
+  } = parts;
+  if (DESKTOP.matches) {
+    nav.append(...[sections, tools].filter(Boolean));
+    bar.insertBefore(nav, hamburger);
+    if (search) bar.insertBefore(search, hamburger);
+  } else {
+    if (tools) bar.insertBefore(tools, hamburger);
+    if (sections) nav.append(sections);
+    drawer.append(...[search, nav].filter(Boolean));
+  }
+}
+
 /**
  * loads and decorates the header
  * @param {Element} el The header element
@@ -249,17 +269,22 @@ export default async function init(el) {
     brand.className = 'nav-brand';
     bar.append(brand);
   }
-  [sections, tools].forEach((section, idx) => {
+  const [sectionsList, toolsList] = [sections, tools].map((section, idx) => {
     const list = section?.querySelector(':scope > ul');
-    if (!list) return;
+    if (!list) return null;
     list.className = `nav-list ${idx === 0 ? 'nav-sections' : 'nav-tools'}`;
     decorateList(list, el, bar);
-    nav.append(list);
+    return list;
   });
   nav.id = 'nav-menu';
-  bar.insertBefore(nav, bar.querySelector('.nav-search'));
   const hamburger = buildHamburger(el);
   bar.append(hamburger);
+  const drawer = document.createElement('div');
+  drawer.className = 'nav-drawer';
+  const parts = {
+    bar, nav, sections: sectionsList, tools: toolsList, search: bar.querySelector('.nav-search'), hamburger, drawer,
+  };
+  placeForViewport(parts);
 
   const overlay = document.createElement('div');
   overlay.className = 'nav-overlay';
@@ -271,7 +296,7 @@ export default async function init(el) {
   const wrapper = document.createElement('div');
   wrapper.className = 'nav-wrapper';
   wrapper.append(bar);
-  el.replaceChildren(wrapper, overlay);
+  el.replaceChildren(wrapper, overlay, drawer);
   decorateSkipLink(el, brand);
   setMenuOpen(el, false);
 
@@ -292,5 +317,6 @@ export default async function init(el) {
     closeAll(el);
     el.classList.remove('is-search-open');
     setMenuOpen(el, false);
+    placeForViewport(parts);
   });
 }

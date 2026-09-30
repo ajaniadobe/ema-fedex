@@ -98,20 +98,17 @@ header {
     }
   }
 
-  /* ---------- mobile: nav holds the drawer (sections) + the account icon in the bar ---------- */
-  nav {
-    display: contents;
-  }
-
-  .nav-sections {
+  /* ---------- mobile: full-width drawer (search + primary nav) under the bar ---------- */
+  .nav-drawer {
     display: none;
     position: fixed;
-    inset: calc(var(--nav-height) + var(--nav-search-height)) 0 0;
+    inset: var(--nav-height) 0 0;
+    z-index: 1;
     overflow-y: auto;
     background-color: var(--panel-grey);
   }
 
-  &.is-menu-open .nav-sections {
+  &.is-menu-open .nav-drawer {
     display: block;
   }
 
@@ -378,19 +375,13 @@ header {
     }
   }
 
-  /* search: first row of the open mobile drawer */
+  /* search: first row of the mobile drawer */
   .nav-search {
-    display: none;
-    position: fixed;
-    inset: var(--nav-height) 0 auto;
+    display: flex;
     height: var(--nav-search-height);
     margin: 0;
     border-top: 1px solid rgb(255 255 255 / 25%);
     background-color: var(--nav-purple);
-  }
-
-  &.is-menu-open .nav-search {
-    display: flex;
   }
 
   .nav-search-field {
@@ -485,15 +476,16 @@ header {
       margin-top: 0;
     }
 
-    .nav-sections,
-    &.is-menu-open .nav-sections {
-      position: static;
+    .nav-drawer,
+    &.is-menu-open .nav-drawer {
+      display: none;
+    }
+
+    .nav-sections {
       display: flex;
       align-items: stretch;
       height: 100%;
       margin-left: 4px;
-      overflow: visible;
-      background: none;
     }
 
     .nav-sections > .nav-item {
@@ -597,8 +589,7 @@ header {
     }
 
     /* expandable search bar replaces the nav while open */
-    .nav-search,
-    &.is-menu-open .nav-search {
+    .nav-search {
       display: none;
       position: absolute;
       inset: 0 10px 0 188px;
