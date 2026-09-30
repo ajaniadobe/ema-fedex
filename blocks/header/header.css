@@ -1,7 +1,9 @@
-/* FedEx header — values measured from fedex.com (desktop 1440px). Mobile-first; desktop at 900px+. */
+/* FedEx header — values measured from fedex.com. Mobile-first: hamburger + accordion drawer,
+   desktop click-dropdowns from 1024px (the width at which fedex.com switches). */
 header {
   --nav-purple: var(--brand-purple);
   --nav-height: var(--header-height);
+  --nav-search-height: 60px;
   --nav-divider: rgb(182 182 182 / 50%);
   --nav-sprite: url("menu-sprite.png");
 
@@ -77,14 +79,16 @@ header {
 
   .nav-brand {
     flex: 0 0 auto;
+    align-self: flex-start;
+    margin-right: auto;
 
     a {
       position: relative;
       display: inline-block;
       box-sizing: border-box;
-      width: 125px;
-      height: var(--nav-height);
-      padding-top: 25px;
+      width: 103px;
+      height: 60px;
+      padding-top: 18px;
     }
 
     img {
@@ -94,37 +98,406 @@ header {
     }
   }
 
+  /* ---------- mobile: nav holds the drawer (sections) + the account icon in the bar ---------- */
   nav {
-    display: none;
-    flex: 1 1 auto;
-    height: 100%;
+    display: contents;
   }
 
+  .nav-sections {
+    display: none;
+    position: fixed;
+    inset: calc(var(--nav-height) + var(--nav-search-height)) 0 0;
+    overflow-y: auto;
+    background-color: var(--panel-grey);
+  }
+
+  &.is-menu-open .nav-sections {
+    display: block;
+  }
+
+  .nav-sections > .nav-item {
+    border-bottom: 1px solid #fff;
+  }
+
+  .nav-trigger {
+    display: block;
+    width: 100%;
+    padding: 17px 26px;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 14px;
+    color: var(--text-color);
+    text-align: left;
+  }
+
+  .nav-trigger-text::after {
+    content: "";
+    display: inline-block;
+    width: 12px;
+    height: 8px;
+    margin-left: 5px;
+    background: var(--nav-sprite) 0 -20px / 77px 56px no-repeat;
+  }
+
+  .nav-sections .nav-item.is-open > .nav-trigger {
+    background-color: var(--nav-purple);
+    color: #fff;
+
+    .nav-trigger-text {
+      text-decoration: underline;
+    }
+
+    .nav-trigger-text::after {
+      background-position: 0 -13px;
+    }
+  }
+
+  /* account trigger: icon only in the bar */
+  .nav-tools {
+    display: flex;
+    align-self: flex-start;
+    margin-top: 1px;
+  }
+
+  .nav-tools .nav-trigger {
+    display: flex;
+    justify-content: center;
+    width: 64px;
+    height: 60px;
+    padding: 0;
+    align-items: center;
+
+    .nav-trigger-text {
+      font-size: 0;
+    }
+
+    .nav-trigger-text::after {
+      width: 28px;
+      height: 27px;
+      margin: 0;
+      background-position: -12px 0;
+    }
+  }
+
+  .nav-search-item {
+    display: none;
+  }
+
+  /* dropdown panels: in-flow accordion on mobile; the account panel drops under the bar */
+  .nav-panel {
+    display: none;
+    grid-template-rows: 1fr;
+    background-color: #fff;
+    transition: grid-template-rows 0.5s;
+  }
+
+  .nav-item.is-open > .nav-panel {
+    display: grid;
+
+    @starting-style {
+      grid-template-rows: 0fr;
+    }
+  }
+
+  .nav-tools .nav-panel {
+    position: fixed;
+    inset: var(--nav-height) 0 auto;
+    max-height: calc(100vh - var(--nav-height));
+    overflow-y: auto;
+  }
+
+  .nav-panel-inner {
+    overflow: hidden;
+  }
+
+  .nav-panel-list > li {
+    border-bottom: 1px solid var(--nav-divider);
+
+    &:last-child {
+      border-bottom: 0;
+    }
+
+    > a,
+    > strong > a {
+      display: block;
+      padding: 19px 13px 18px;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 21px;
+      color: var(--text-color);
+
+      &:hover,
+      &:focus-visible {
+        background-color: var(--panel-grey);
+        text-decoration: none;
+      }
+    }
+
+    > strong > a {
+      font-weight: 700;
+      line-height: 18.2px;
+      color: var(--link-color);
+      text-transform: uppercase;
+
+      &:hover,
+      &:focus-visible {
+        color: var(--link-hover-color);
+      }
+    }
+  }
+
+  /* inline tracking form */
+  .nav-panel-form {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 21px 20px 16px;
+
+    label {
+      font-size: 14px;
+      line-height: 21px;
+      color: var(--text-color);
+    }
+
+    input {
+      box-sizing: border-box;
+      width: 100%;
+      height: 56px;
+      padding: 0 10px;
+      border: 1px solid var(--input-border-color);
+      border-radius: 0;
+      font-size: 16px;
+      color: #000;
+
+      &::placeholder {
+        font-style: italic;
+        color: #666;
+      }
+    }
+
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      height: 56px;
+      margin-top: 8px;
+      background-color: var(--button-orange);
+      color: #fff;
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 24.7px;
+      letter-spacing: 0.95px;
+      text-transform: uppercase;
+      transition: background-color 0.2s;
+
+      &::after {
+        content: "";
+        width: 24px;
+        height: 24px;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M14 3L23 12L14 21'/%3E%3Cpath d='M23 12H0'/%3E%3C/svg%3E") center / contain no-repeat;
+      }
+
+      &:hover,
+      &:focus-visible {
+        background-color: var(--button-orange-hover);
+      }
+    }
+  }
+
+  /* account note: "Open an account to save on shipping costs…" */
+  .nav-panel-note p {
+    padding: 14px 16px 13px;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 24px;
+    letter-spacing: -0.1px;
+    color: var(--text-color);
+
+    a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-color);
+      text-decoration: underline;
+
+      &:hover,
+      &:focus-visible {
+        color: var(--link-color);
+      }
+    }
+  }
+
+  /* hamburger: three 25x1.5px lines that morph into an X */
+  .nav-hamburger {
+    position: relative;
+    width: 37px;
+    height: 30px;
+    padding: 0 6px;
+  }
+
+  .nav-hamburger-lines,
+  .nav-hamburger-lines::before,
+  .nav-hamburger-lines::after {
+    position: absolute;
+    left: 6px;
+    width: 25px;
+    height: 1.5px;
+    background-color: #fff;
+    transition: transform 0.15s ease;
+  }
+
+  .nav-hamburger-lines {
+    top: 5px;
+
+    &::before,
+    &::after {
+      content: "";
+      left: 0;
+    }
+
+    &::before {
+      top: 9px;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    &::after {
+      top: 18px;
+    }
+  }
+
+  &.is-menu-open .nav-hamburger-lines {
+    transform: translateY(9px) rotate(45deg);
+
+    &::before {
+      opacity: 0;
+      transform: rotate(-45deg) translate(-5.857px, -6px);
+    }
+
+    &::after {
+      transform: translateY(-18px) rotate(-90deg);
+    }
+  }
+
+  /* search: first row of the open mobile drawer */
   .nav-search {
     display: none;
+    position: fixed;
+    inset: var(--nav-height) 0 auto;
+    height: var(--nav-search-height);
+    margin: 0;
+    border-top: 1px solid rgb(255 255 255 / 25%);
+    background-color: var(--nav-purple);
   }
 
+  &.is-menu-open .nav-search {
+    display: flex;
+  }
+
+  .nav-search-field {
+    display: flex;
+    flex: 1 1 auto;
+    height: 100%;
+    box-sizing: border-box;
+
+    input {
+      flex: 1 1 auto;
+      min-width: 0;
+      height: 100%;
+      padding: 0 0 0 20px;
+      border: 0;
+      background: transparent;
+      color: #fff;
+      font-size: 16px;
+      outline: none;
+
+      &::placeholder {
+        color: #fff;
+        font-style: italic;
+        opacity: 1;
+      }
+    }
+
+    &:focus-within {
+      box-shadow: inset 0 0 0 1px #fff;
+    }
+  }
+
+  .nav-search-submit {
+    display: flex;
+    flex: 0 0 64px;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px solid #fff;
+
+    &::before {
+      content: "";
+      width: 24px;
+      height: 24px;
+      background: var(--nav-sprite) -40px 0 / 77px 56px no-repeat;
+    }
+  }
+
+  .nav-search-close {
+    display: none;
+  }
+
+  /* page dimming overlay below the header while a panel or the mobile menu is open */
   .nav-overlay {
     display: none;
+    position: fixed;
+    inset: var(--nav-height) 0 0;
+    background-color: rgb(0 0 0 / 25%);
+  }
+
+  &.is-dropdown-open .nav-overlay,
+  &.is-menu-open .nav-overlay {
+    display: block;
   }
 }
 
-@media (width >= 900px) {
+/* breakpoint-exception: fedex.com switches to the desktop nav at 1024px (its nav needs the full 970px column) */
+@media (width >= 1024px) {
   header {
-    nav {
-      display: flex;
-      justify-content: space-between;
+    .nav-brand {
+      margin-right: 0;
+
+      a {
+        width: 125px;
+        height: var(--nav-height);
+        padding-top: 25px;
+      }
     }
 
-    .nav-sections,
-    .nav-tools {
+    nav {
       display: flex;
-      align-items: stretch;
+      flex: 1 1 auto;
+      justify-content: space-between;
       height: 100%;
     }
 
-    .nav-sections {
+    .nav-hamburger {
+      display: none;
+    }
+
+    .nav-tools {
+      align-self: stretch;
+      height: 100%;
+      margin-top: 0;
+    }
+
+    .nav-sections,
+    &.is-menu-open .nav-sections {
+      position: static;
+      display: flex;
+      align-items: stretch;
+      height: 100%;
       margin-left: 4px;
+      overflow: visible;
+      background: none;
+    }
+
+    .nav-sections > .nav-item {
+      border-bottom: 0;
     }
 
     .nav-item {
@@ -133,28 +506,26 @@ header {
 
     /* trigger: 400 14px white label + 12x10 sprite chevron */
     .nav-trigger {
-      display: block;
+      width: auto;
       padding: 31px 15px 30px;
-      font-size: 14px;
-      line-height: 14px;
+      font-weight: 400;
       color: #fff;
       white-space: nowrap;
     }
 
     .nav-trigger-text::after {
-      content: "";
-      display: inline-block;
-      width: 12px;
       height: 10px;
-      margin-left: 5px;
-      background: var(--nav-sprite) 0 -4px / 77px 56px no-repeat;
+      background-position: 0 -4px;
     }
 
-    .nav-item.is-open {
+    .nav-item.is-open,
+    .nav-tools .nav-item.is-open {
       background-color: #fff;
     }
 
-    .nav-item.is-open > .nav-trigger {
+    .nav-item.is-open > .nav-trigger,
+    .nav-sections .nav-item.is-open > .nav-trigger {
+      background-color: transparent;
       color: var(--nav-purple);
 
       .nav-trigger-text {
@@ -168,7 +539,14 @@ header {
 
     /* "Sign Up or Log In": label + 28x27 user icon, no chevron */
     .nav-tools .nav-trigger {
+      display: block;
+      width: auto;
+      height: auto;
       padding: 25px 16px 23px;
+
+      .nav-trigger-text {
+        font-size: 14px;
+      }
 
       .nav-trigger-text::after {
         width: 28px;
@@ -184,6 +562,7 @@ header {
     }
 
     .nav-search-item {
+      display: block;
       padding: 23px 0 0 4px;
     }
 
@@ -203,164 +582,31 @@ header {
       }
     }
 
-    /* dropdown: 240px white single column below the trigger, height slide 0.5s */
-    .nav-panel {
+    /* dropdown: 240px white single column below the trigger */
+    .nav-panel,
+    .nav-tools .nav-panel {
       position: absolute;
-      top: 100%;
-      left: 0;
+      inset: 100% auto auto 0;
       width: 240px;
-      display: none;
-      grid-template-rows: 1fr;
-      background-color: #fff;
-      transition: grid-template-rows 0.5s;
+      max-height: none;
+      overflow: visible;
     }
 
-    .nav-item.is-open > .nav-panel {
-      display: grid;
-
-      @starting-style {
-        grid-template-rows: 0fr;
-      }
-    }
-
-    .nav-panel-inner {
-      overflow: hidden;
-    }
-
-    .nav-panel-list > li {
-      border-bottom: 1px solid var(--nav-divider);
-
-      &:last-child {
-        border-bottom: 0;
-      }
-
-      > a,
-      > strong > a {
-        display: block;
-        padding: 19px 13px 18px;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 21px;
-        color: var(--text-color);
-
-        &:hover,
-        &:focus-visible {
-          background-color: var(--panel-grey);
-          text-decoration: none;
-        }
-      }
-
-      > strong > a {
-        font-weight: 700;
-        line-height: 18.2px;
-        color: var(--link-color);
-        text-transform: uppercase;
-
-        &:hover,
-        &:focus-visible {
-          color: var(--link-hover-color);
-        }
-      }
-    }
-
-    /* inline tracking form */
     .nav-panel-form {
-      display: flex;
-      flex-direction: column;
       padding: 21px 16px 16px;
-
-      label {
-        font-size: 14px;
-        line-height: 21px;
-        color: var(--text-color);
-      }
-
-      input {
-        box-sizing: border-box;
-        width: 100%;
-        height: 56px;
-        padding: 0 10px;
-        border: 1px solid var(--input-border-color);
-        border-radius: 0;
-        font-size: 16px;
-        color: #000;
-
-        &::placeholder {
-          font-style: italic;
-          color: #666;
-        }
-      }
-
-      button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 18px;
-        height: 56px;
-        margin-top: 8px;
-        background-color: var(--button-orange);
-        color: #fff;
-        font-size: 19px;
-        font-weight: 700;
-        line-height: 24.7px;
-        letter-spacing: 0.95px;
-        text-transform: uppercase;
-        transition: background-color 0.2s;
-
-        &::after {
-          content: "";
-          width: 24px;
-          height: 24px;
-          background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M14 3L23 12L14 21'/%3E%3Cpath d='M23 12H0'/%3E%3C/svg%3E") center / contain no-repeat;
-        }
-
-        &:hover,
-        &:focus-visible {
-          background-color: var(--button-orange-hover);
-        }
-      }
-    }
-
-    /* account note: "Open an account to save on shipping costs…" */
-    .nav-panel-note p {
-      padding: 14px 16px 13px;
-      font-size: 16px;
-      font-weight: 300;
-      line-height: 24px;
-      letter-spacing: -0.1px;
-      color: var(--text-color);
-
-      a {
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--text-color);
-        text-decoration: underline;
-
-        &:hover,
-        &:focus-visible {
-          color: var(--link-color);
-        }
-      }
-    }
-
-    /* page dimming overlay below the header while a dropdown is open */
-    .nav-overlay {
-      position: fixed;
-      inset: var(--nav-height) 0 0;
-      background-color: rgb(0 0 0 / 25%);
-    }
-
-    &.is-dropdown-open .nav-overlay {
-      display: block;
     }
 
     /* expandable search bar replaces the nav while open */
-    .nav-search {
+    .nav-search,
+    &.is-menu-open .nav-search {
+      display: none;
       position: absolute;
       inset: 0 10px 0 188px;
-      margin: 0;
+      height: auto;
       align-items: center;
       gap: 21px;
+      border: 0;
+      background: none;
     }
 
     &.is-search-open {
@@ -374,10 +620,7 @@ header {
     }
 
     .nav-search-field {
-      display: flex;
-      flex: 1 1 auto;
       height: 47px;
-      box-sizing: border-box;
       border: 1px solid #fff;
       border-radius: 40px;
       overflow: hidden;
@@ -385,45 +628,21 @@ header {
       &:focus-within {
         box-shadow: 0 0 0 1px #fff;
       }
-
-      input {
-        flex: 1 1 auto;
-        min-width: 0;
-        height: 100%;
-        padding: 0 0 0 20px;
-        border: 0;
-        background: transparent;
-        color: #fff;
-        font-size: 16px;
-        outline: none;
-
-        &::placeholder {
-          color: #fff;
-          font-style: italic;
-          opacity: 1;
-        }
-      }
-    }
-
-    .nav-search-submit {
-      display: flex;
-      flex: 0 0 64px;
-      align-items: center;
-      justify-content: center;
-      border-left: 1px solid #fff;
-
-      &::before {
-        content: "";
-        width: 24px;
-        height: 24px;
-        background: var(--nav-sprite) -40px 0 / 77px 56px no-repeat;
-      }
     }
 
     .nav-search-close {
+      display: block;
       width: 12px;
       height: 12px;
       background: var(--nav-sprite) -66px 0 / 77px 56px no-repeat;
+    }
+
+    &.is-menu-open .nav-overlay {
+      display: none;
+    }
+
+    &.is-dropdown-open .nav-overlay {
+      display: block;
     }
   }
 }

@@ -12,26 +12,29 @@
  *   <li><p>text with <a>link</a></p></li> -> note paragraph
  */
 
-const NAV_PATHS = ['/content/nav.plain.html', '/nav.plain.html'];
-const DESKTOP = window.matchMedia('(width >= 900px)');
+const DESKTOP = window.matchMedia('(width >= 1024px)');
 
 async function fetchNav() {
-  for (const path of NAV_PATHS) {
-    // metadata-independent: /content first (local preview), then site root (DA/EDS)
-    // eslint-disable-next-line no-await-in-loop
-    const resp = await fetch(path);
-    if (resp.ok) {
-      const wrapper = document.createElement('div');
-      // eslint-disable-next-line no-await-in-loop
-      wrapper.innerHTML = await resp.text();
-      // relative media paths in the fragment resolve against the fragment, not the page
-      wrapper.querySelectorAll('img[src]').forEach((img) => {
-        img.src = new URL(img.getAttribute('src'), resp.url).href;
-      });
-      return wrapper;
-    }
-  }
-  return null;
+  // metadata-independent: /content first (local preview), then site root (DA/EDS)
+  let resp = await fetch('/content/nav.plain.html');
+  if (!resp.ok) resp = await fetch('/nav.plain.html');
+  if (!resp.ok) return null;
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = await resp.text();
+  // relative media paths in the fragment resolve against the fragment, not the page
+  wrapper.querySelectorAll('img[src]').forEach((img) => {
+    img.src = new URL(img.getAttribute('src'), resp.url).href;
+  });
+  return wrapper;
+}
+
+function setMenuOpen(header, open) {
+  header.classList.toggle('is-menu-open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+  const btn = header.querySelector('.nav-hamburger');
+  if (!btn) return;
+  btn.setAttribute('aria-expanded', String(open));
+  btn.setAttribute('aria-label', open ? 'Close Menu' : 'Open Menu');
 }
 
 function closeAll(header) {
@@ -46,9 +49,27 @@ function toggleItem(header, item) {
   const wasOpen = item.classList.contains('is-open');
   closeAll(header);
   if (wasOpen) return;
+  // the mobile account panel and the mobile menu are mutually exclusive
+  if (!DESKTOP.matches && item.closest('.nav-tools')) setMenuOpen(header, false);
   item.classList.add('is-open');
   item.querySelector(':scope > .nav-trigger').setAttribute('aria-expanded', 'true');
   header.classList.add('is-dropdown-open');
+}
+
+function buildHamburger(header) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'nav-hamburger';
+  btn.setAttribute('aria-controls', 'nav-menu');
+  const lines = document.createElement('span');
+  lines.className = 'nav-hamburger-lines';
+  btn.append(lines);
+  btn.addEventListener('click', () => {
+    const open = !header.classList.contains('is-menu-open');
+    closeAll(header);
+    setMenuOpen(header, open);
+  });
+  return btn;
 }
 
 // <li><p>Label</p><p><em><a href="…=">Submit</a></em></p></li> -> label + input + submit button
@@ -235,28 +256,41 @@ export default async function init(el) {
     decorateList(list, el, bar);
     nav.append(list);
   });
+  nav.id = 'nav-menu';
   bar.insertBefore(nav, bar.querySelector('.nav-search'));
+  const hamburger = buildHamburger(el);
+  bar.append(hamburger);
 
   const overlay = document.createElement('div');
   overlay.className = 'nav-overlay';
-  overlay.addEventListener('click', () => closeAll(el));
+  overlay.addEventListener('click', () => {
+    closeAll(el);
+    setMenuOpen(el, false);
+  });
 
   const wrapper = document.createElement('div');
   wrapper.className = 'nav-wrapper';
   wrapper.append(bar);
   el.replaceChildren(wrapper, overlay);
   decorateSkipLink(el, brand);
+  setMenuOpen(el, false);
 
   document.addEventListener('click', (e) => { if (!el.contains(e.target)) closeAll(el); });
   el.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     const open = el.querySelector('.nav-item.is-open > .nav-trigger');
     closeAll(el);
-    open?.focus();
+    if (open) {
+      open.focus();
+    } else if (el.classList.contains('is-menu-open')) {
+      setMenuOpen(el, false);
+      hamburger.focus();
+    }
   });
-  // Crossing the desktop breakpoint resets any open panel / search state.
+  // Crossing the desktop breakpoint resets any open panel / search / mobile menu state.
   DESKTOP.addEventListener('change', () => {
     closeAll(el);
-    el.classList.remove('is-search-open', 'is-menu-open');
+    el.classList.remove('is-search-open');
+    setMenuOpen(el, false);
   });
 }

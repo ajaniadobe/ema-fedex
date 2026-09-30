@@ -13,3 +13,4 @@ helix-importer-ui
 docs/adr/0000-own-the-page-lifecycle.spicy.md
 
 migration-work/navigation-validation/
+migration-work/footer-validation/

@@ -1,43 +1,101 @@
 import { expect } from '@esm-bundle/chai';
 import init from '../../blocks/footer/footer.js';
 
-describe('footer source', () => {
-  const originalFetch = window.fetch;
-  const metas = [];
-  let fetched;
+const FOOTER_HTML = `<div>
+  <h2>Our Company</h2>
+  <ul><li><a href="/about">About</a></li></ul>
+  <ul><li><a href="/blog">Blog</a></li></ul>
+  <h2>Policy Center</h2>
+  <ul><li><a href="/terms">Terms of Use</a></li></ul>
+</div>
+<div>
+  <p><a href="/?location=home"><img src="images/globe.svg" alt=""> United States</a></p>
+  <ul>
+    <li><a href="https://www.example.com/en-us/home.html">English</a></li>
+    <li><a href="https://www.example.com/es-us/home.html">Español</a></li>
+  </ul>
+</div>
+<div>
+  <p>Follow Us</p>
+  <ul><li><a href="https://social.example.com/"><img src="images/social.svg" alt="Social"></a></li></ul>
+</div>
+<div>
+  <p>© Example</p>
+  <ul><li><a href="/sitemap">Site Map</a></li></ul>
+</div>`;
 
-  const setMeta = (name, content) => {
-    const meta = document.createElement('meta');
-    meta.name = name;
-    meta.content = content;
-    document.head.append(meta);
-    metas.push(meta);
-  };
+const originalFetch = window.fetch;
+const mounted = [];
+let requested;
 
-  const fetchedPath = async () => {
-    await init(document.createElement('footer')).catch(() => {});
-    return fetched;
-  };
-
-  beforeEach(() => {
-    window.fetch = async (path) => {
-      fetched = path;
-      return { ok: false };
+async function mountFooter({ contentOk = true } = {}) {
+  requested = [];
+  window.fetch = async (path) => {
+    requested.push(path);
+    const ok = path === '/content/footer.plain.html' ? contentOk : true;
+    return {
+      ok,
+      url: new URL(path, window.location.origin).href,
+      text: async () => FOOTER_HTML,
     };
+  };
+  const el = document.createElement('footer');
+  document.body.append(el);
+  mounted.push(el);
+  await init(el);
+  return el;
+}
+
+afterEach(() => {
+  window.fetch = originalFetch;
+  mounted.splice(0).forEach((el) => el.remove());
+});
+
+describe('footer source', () => {
+  it('loads /content/footer.plain.html first', async () => {
+    await mountFooter();
+    expect(requested).to.deep.equal(['/content/footer.plain.html']);
   });
 
-  afterEach(() => {
-    window.fetch = originalFetch;
-    metas.splice(0).forEach((meta) => meta.remove());
+  it('falls back to /footer.plain.html when the content path is missing', async () => {
+    await mountFooter({ contentOk: false });
+    expect(requested).to.deep.equal(['/content/footer.plain.html', '/footer.plain.html']);
+  });
+});
+
+describe('footer structure', () => {
+  it('renders three bands: links, social, copyright', async () => {
+    const el = await mountFooter();
+    const bands = [...el.children].map((c) => c.className);
+    expect(bands).to.deep.equal([
+      'footer-band footer-band-primary',
+      'footer-band footer-band-social',
+      'footer-band footer-copyright',
+    ]);
   });
 
-  it('loads the default fragment when a different footer block is chosen', async () => {
-    setMeta('footer', 'custom-landing-footer');
-    expect(await fetchedPath()).to.equal('/fragments/nav/footer');
+  it('groups lists under each heading as one column', async () => {
+    const el = await mountFooter();
+    const columns = [...el.querySelectorAll('.footer-column')];
+    expect(columns.map((c) => c.querySelector('.footer-column-title').textContent)).to.deep.equal(['Our Company', 'Policy Center']);
+    expect(columns[0].querySelectorAll('.footer-column-lists ul').length).to.equal(2);
   });
 
-  it('loads the fragment named by footer-source', async () => {
-    setMeta('footer-source', '/fragments/nav/landing-footer');
-    expect(await fetchedPath()).to.equal('/fragments/nav/landing-footer');
+  it('resolves fragment-relative images against the fragment URL', async () => {
+    const el = await mountFooter();
+    expect(el.querySelector('.footer-country-icon').src).to.equal(new URL('/content/images/globe.svg', window.location.origin).href);
+  });
+});
+
+describe('footer language dropdown', () => {
+  it('toggles the language list', async () => {
+    const el = await mountFooter();
+    const toggle = el.querySelector('.footer-language-toggle');
+    expect(toggle.getAttribute('aria-expanded')).to.equal('false');
+    expect(document.getElementById(toggle.getAttribute('aria-controls'))).to.exist;
+    toggle.click();
+    expect(toggle.getAttribute('aria-expanded')).to.equal('true');
+    toggle.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(toggle.getAttribute('aria-expanded')).to.equal('false');
   });
 });
