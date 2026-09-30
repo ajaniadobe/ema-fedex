@@ -213,9 +213,12 @@ function decorateList(list, header, bar) {
   });
 }
 
-// authored "#main" link in the brand section becomes the skip link
+// the brand section's text-only link becomes the skip link (the logo link has the image).
+// Matched by role, not href: Document Authoring saves an authored "#main" link as "/".
 function decorateSkipLink(header, brand) {
-  const skip = brand?.querySelector('a[href^="#"]');
+  const links = [...(brand?.querySelectorAll('a') || [])];
+  const skip = links.find((a) => a.getAttribute('href')?.startsWith('#'))
+    || links.find((a) => !a.querySelector('img, picture, svg') && a.textContent.trim());
   const main = document.querySelector('main');
   if (!skip || !main) return;
   if (!main.id) main.id = skip.hash.slice(1) || 'main';
