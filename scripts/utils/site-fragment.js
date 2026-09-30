@@ -17,12 +17,20 @@ function resolveMedia(wrapper, base) {
   });
 }
 
+// only the local preview (aem up) serves content under /content; elsewhere that attempt just 404s
+const isLocalPreview = () => window.location.pathname.startsWith('/content/')
+  || ['localhost', '127.0.0.1'].includes(window.location.hostname);
+
+export function fragmentUrls(paths, local = isLocalPreview()) {
+  return paths.flatMap((p) => (local ? [`/content${p}.plain.html`, `${p}.plain.html`] : [`${p}.plain.html`]));
+}
+
 /**
  * Fetches a site-wide fragment (header, footer) as a detached element, or null.
  *
  * Path: the page's `<name>-source` metadata, else `defaultPath`, under the page's locale,
- * falling back to the root locale. Each path is tried under /content first (local preview),
- * then as-is (DA/EDS). Metadata is normalised to a bare path so a value like
+ * falling back to the root locale. On the local preview each path is tried under /content
+ * first, then as-is; on DA/EDS only as-is. Metadata is normalised to a bare path so a value like
  * `/content/fragments/nav/header` can't turn both attempts into the local-only path.
  * @param {string} name metadata prefix, e.g. 'header' reads `header-source`
  * @param {string} defaultPath e.g. '/fragments/nav/header'
@@ -35,7 +43,7 @@ export default async function fetchSiteFragment(name, defaultPath) {
   const { prefix } = getConfig().locale;
   const localized = !prefix || path.startsWith(`${prefix}/`) ? path : `${prefix}${path}`;
   const paths = [...new Set([localized, path])];
-  const resp = await firstOk(paths.flatMap((p) => [`/content${p}.plain.html`, `${p}.plain.html`]));
+  const resp = await firstOk(fragmentUrls(paths));
   if (!resp) return null;
   const wrapper = document.createElement('div');
   wrapper.innerHTML = await resp.text();
