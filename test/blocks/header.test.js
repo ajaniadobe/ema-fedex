@@ -37,7 +37,7 @@ const originalFetch = window.fetch;
 const mounted = [];
 let requested;
 
-async function mountHeader({ contentOk = true } = {}) {
+async function mountHeader({ contentOk = true, html = NAV_HTML } = {}) {
   requested = [];
   window.fetch = async (path) => {
     requested.push(path);
@@ -45,7 +45,7 @@ async function mountHeader({ contentOk = true } = {}) {
     return {
       ok,
       url: new URL(path, window.location.origin).href,
-      text: async () => NAV_HTML,
+      text: async () => html,
     };
   };
   if (!document.querySelector('main')) document.body.append(document.createElement('main'));
@@ -99,6 +99,16 @@ describe('header structure', () => {
     const skip = el.querySelector('.skip-link');
     expect(skip.textContent).to.equal('Skip to main content');
     expect(skip.getAttribute('href')).to.equal(`#${document.querySelector('main').id}`);
+  });
+
+  it('finds the skip link when Document Authoring saved its href as "/"', async () => {
+    const el = await mountHeader({ html: NAV_HTML.replace('href="#main"', 'href="/"') });
+    const skip = el.querySelector('.skip-link');
+    expect(skip.textContent).to.equal('Skip to main content');
+    expect(skip.getAttribute('href')).to.equal(`#${document.querySelector('main').id}`);
+    const brand = el.querySelector('.nav-brand');
+    expect(brand.textContent.trim()).to.equal('');
+    expect(brand.querySelector('img')).to.exist;
   });
 
   it('builds a button trigger and panel for every dropdown item', async () => {
