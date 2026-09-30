@@ -1,5 +1,6 @@
 import { expect } from '@esm-bundle/chai';
 import init from '../../blocks/header/header.js';
+import { fragmentUrls } from '../../scripts/utils/site-fragment.js';
 
 const NAV_HTML = `<div>
   <p><a href="#main">Skip to main content</a></p>
@@ -71,6 +72,11 @@ describe('header nav source', () => {
   it('falls back to /fragments/nav/header.plain.html when the content path is missing', async () => {
     await mountHeader({ contentOk: false });
     expect(requested).to.deep.equal(['/content/fragments/nav/header.plain.html', '/fragments/nav/header.plain.html']);
+  });
+
+  it('skips the /content attempt outside the local preview', () => {
+    expect(fragmentUrls(['/fragments/nav/header'], false)).to.deep.equal(['/fragments/nav/header.plain.html']);
+    expect(fragmentUrls(['/fragments/nav/header'], true)).to.deep.equal(['/content/fragments/nav/header.plain.html', '/fragments/nav/header.plain.html']);
   });
 
   it('uses header-source metadata, normalised to a bare path', async () => {
