@@ -84,6 +84,8 @@ footer {
 
   .footer-column-lists a {
     display: block;
+    box-sizing: border-box;
+    min-height: 24px; /* WCAG 2.2 target size */
     padding: 4px 0;
     font-size: 12px;
     line-height: 15.6px;
