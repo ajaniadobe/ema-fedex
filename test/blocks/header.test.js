@@ -90,8 +90,9 @@ describe('header structure', () => {
 
   it('builds a button trigger and panel for every dropdown item', async () => {
     const el = await mountHeader();
-    const triggers = [...el.querySelectorAll('.nav-trigger')].map((t) => t.textContent);
-    expect(triggers).to.deep.equal(['Shipping', 'Tracking', 'Sign Up or Log In']);
+    // DOM order depends on the viewport (the account list sits in the bar on mobile)
+    const triggers = [...el.querySelectorAll('.nav-trigger')].map((t) => t.textContent).sort();
+    expect(triggers).to.deep.equal(['Shipping', 'Sign Up or Log In', 'Tracking']);
     el.querySelectorAll('.nav-trigger').forEach((t) => {
       expect(t.tagName).to.equal('BUTTON');
       expect(document.getElementById(t.getAttribute('aria-controls'))).to.exist;
